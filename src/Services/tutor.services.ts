@@ -1,5 +1,4 @@
 import { env } from "@/env";
-import { Key } from "lucide-react";
 
 interface ServiceOptions {
     cache?: RequestCache;

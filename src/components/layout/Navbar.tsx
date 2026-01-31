@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/sheet";
 import { ModeToggle } from "./ModeToggle";
 import Link from "next/link";
+import Image from "next/image";
 
 interface MenuItem {
     title: string;
@@ -75,8 +76,8 @@ const Navbar = ({
         },
     ],
     auth = {
-        login: { title: "Login", url: "#" },
-        signup: { title: "Sign up", url: "#" },
+        login: { title: "Login", url: "/login" },
+        signup: { title: "Sign up", url: "/register" },
     },
     className,
 }: Navbar1Props) => {
@@ -136,7 +137,9 @@ const Navbar = ({
                             <SheetContent className="overflow-y-auto">
                                 <SheetHeader>
                                     <SheetTitle>
-                                        <Link href={logo.url} className="flex items-center gap-2">
+                                        <Link
+                                            href={logo.url}
+                                            className="flex items-center gap-2">
                                             <img
                                                 src={logo.src}
                                                 className="max-h-8 dark:invert"
@@ -155,10 +158,14 @@ const Navbar = ({
 
                                     <div className="flex flex-col gap-3">
                                         <Button asChild variant="outline">
-                                            <Link href={auth.login.url}>{auth.login.title}</Link>
+                                            <Link href={auth.login.url}>
+                                                {auth.login.title}
+                                            </Link>
                                         </Button>
                                         <Button asChild>
-                                            <Link href={auth.signup.url}>{auth.signup.title}</Link>
+                                            <Link href={auth.signup.url}>
+                                                {auth.signup.title}
+                                            </Link>
                                         </Button>
                                     </div>
                                 </div>
@@ -174,7 +181,8 @@ const Navbar = ({
 const renderMenuItem = (item: MenuItem) => {
     return (
         <NavigationMenuItem key={item.title}>
-            <NavigationMenuLink asChild
+            <NavigationMenuLink
+                asChild
                 href={item.url}
                 className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-muted hover:text-accent-foreground">
                 <Link href={item.url}>{item.title}</Link>
