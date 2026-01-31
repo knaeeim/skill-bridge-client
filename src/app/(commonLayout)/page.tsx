@@ -1,6 +1,12 @@
+import { tutorServices } from '@/Services/tutor.services';
 import React from 'react';
 
-const Home = () => {
+const Home = async() => {
+
+    const { data, error } = await tutorServices.getAllTutors()
+
+    console.log(data);
+
     return (
         <div>
            <h1>Common Layout Page....</h1> 
