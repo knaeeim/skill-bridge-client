@@ -57,5 +57,18 @@ export const tutorServices = {
             }
             return { data: null, error: 'An unknown error occurred' }
         }
+    }, 
+    getAllCategories : async () => {
+        try {
+            const url = new URL(`${API_URL}/admin/all-categories`);
+            const response = await fetch(url.toString());
+            const data = await response.json();
+            return { data: data, error: null }
+        } catch (error : unknown) {
+            if(error instanceof Error) {
+                return { data: null, error: error.message }
+            }
+            return { data: null, error: 'An unknown error occurred' }
+        }
     }
 }

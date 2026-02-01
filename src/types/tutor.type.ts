@@ -1,46 +1,62 @@
-enum UserRole {
-    TUTOR = "TUTOR", 
+import { string } from "zod"
+
+export enum UserRole {
+    TUTOR = "TUTOR",
     STUDENT = "STUDENT",
     ADMIN = "ADMIN"
 }
 
-enum Status {
+export enum Status {
     ACTIVE = "ACTIVE",
     BANNED = "BANNED",
     PENDING = "PENDING"
 }
 
-enum Subjects {
-  // General
-  MATH,
-  ENGLISH,
-  SCIENCE,
-  
-  // Specific Math
-  CALCULUS,
-  ALGEBRA,
-  GEOMETRY,
-  
-  // Science
-  PHYSICS,
-  CHEMISTRY,
-  BIOLOGY,
-  ICT,
-  
-  // Business
-  ACCOUNTING,
-  FINANCE,
-  ECONOMICS,
-  MARKETING,
-  
-  // Tech
-  PROGRAMMING,
-  WEB_DEVELOPMENT,
-  DATA_SCIENCE,
-  
-  // Prep
-  IELTS,
-  ADMISSION_TEST
+export interface Category {
+    id: string
+    name: string
+    description?: string | null
+    createdAt?: string
+    updatedAt?: string
+}
+
+export interface AvailabilitySlot {
+    daysOfWeek: string[]; // e.g. ["MONDAY", "TUESDAY"]
+    startTime: string;
+    endTime: string;
+}
+
+export enum Subjects {
+    // General
+    MATH,
+    ENGLISH,
+    SCIENCE,
+
+    // Specific Math
+    CALCULUS,
+    ALGEBRA,
+    GEOMETRY,
+
+    // Science
+    PHYSICS,
+    CHEMISTRY,
+    BIOLOGY,
+    ICT,
+
+    // Business
+    ACCOUNTING,
+    FINANCE,
+    ECONOMICS,
+    MARKETING,
+
+    // Tech
+    PROGRAMMING,
+    WEB_DEVELOPMENT,
+    DATA_SCIENCE,
+
+    // Prep
+    IELTS,
+    ADMISSION_TEST
 }
 
 export interface Tutor {
@@ -64,7 +80,9 @@ export interface Tutor {
         totalReviews: number;
         isApproved: boolean;
         isFeatured: boolean;
-        subjects : Subjects[];
+        category: Category[];
+        subjects: Subjects[];
+        availabilities : AvailabilitySlot[];
         createdAt: string;
         updatedAt: string;
     }

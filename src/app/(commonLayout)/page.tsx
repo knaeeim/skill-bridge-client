@@ -7,10 +7,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, BookOpen, Clock, Star, ArrowRight, CheckCircle2 } from "lucide-react";
 import { tutorServices } from "@/Services/tutor.services";
 import { Tutor } from "@/types";
+import { authClient } from "@/lib/auth-client";
 
 export default async function Home() {
     const { data : tutors } = await tutorServices.getAllTutors();
-    console.log(tutors);
+    const session = await authClient.getSession();
+    console.log(session);
     return (
         <div className="flex flex-col min-h-screen">
             {/* --- HERO SECTION --- */}
