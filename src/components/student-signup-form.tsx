@@ -1,5 +1,6 @@
 "use client"
 
+import { createStudentProfileAction } from "@/actions/student.action";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -13,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "@tanstack/react-form";
 import { GraduationCap, Send } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import * as z from "zod";
 
 const StudentRegisterForm = z.object({
@@ -20,7 +22,9 @@ const StudentRegisterForm = z.object({
     email: z.email(),
     password: z.string().min(8, "Password must be at least 8 characters long"),
     role: z.literal("STUDENT"),
-    bio: z.string().min(10, "Bio must be at least 10 characters long"),
+    profile: z.object({
+        bio: z.string().min(10, "Bio must be at least 10 characters long")
+    }),
 })
 
 export function StudentSignupForm({ ...props }: React.ComponentProps<typeof Card>) {
@@ -30,13 +34,28 @@ export function StudentSignupForm({ ...props }: React.ComponentProps<typeof Card
             email: "",
             password: "",
             role: "STUDENT",
-            bio: ""
+            profile: {
+                bio: ""
+            }
         },
         validators: {
             onChange: StudentRegisterForm
         },
         onSubmit: async ({ value }) => {
-            console.log(value);
+            const toastId = toast.loading("Creating your student account...");
+            try {
+                const {data ,error} = await createStudentProfileAction(value)
+                console.log(data);
+                if(error){
+                    return toast.error(`Failed to create account: ${error}`, { id: toastId });
+                }
+                toast.success("Student account created successfully!", { id: toastId });
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    return toast.error(`Failed to create account: ${error.message}`, { id: toastId });
+                }
+                toast.error("Failed to create account: Unknown error", { id: toastId });
+            }
         }
     })
 
@@ -142,7 +161,7 @@ export function StudentSignupForm({ ...props }: React.ComponentProps<typeof Card
                         </div>
 
                         <form.Field
-                            name="bio"
+                            name="profile.bio"
                             children={(field) => {
                                 return (
                                     <Field>

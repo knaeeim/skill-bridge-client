@@ -22,7 +22,7 @@ import {
 import { ModeToggle } from "./ModeToggle";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getSession } from "@/actions/getSession.action";
+import { authClient } from "@/lib/auth-client";
 
 interface MenuItem {
     title: string;
@@ -51,12 +51,16 @@ interface Navbar1Props {
             title: string;
             url: string;
         };
+        dashboard: {
+            title: string;
+            url: string;
+        };
     };
 }
 
 const Navbar = ({
     logo = {
-        url: "https://www.shadcnblocks.com",
+        url: "/",
         src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/shadcnblockscom-icon.svg",
         alt: "logo",
         title: "Mentora",
@@ -79,23 +83,18 @@ const Navbar = ({
     auth = {
         login: { title: "Login", url: "/login" },
         signup: { title: "Register", url: "/register" },
+        dashboard: { title: "Dashboard", url: "/dashboard" },
     },
     className,
 }: Navbar1Props) => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const { data: session, isPending } = authClient.useSession();
 
-    useEffect(() => {
-        const fetchSessionData = async () => {
-            const session = await getSession();
-            if (session?.data?.user) {
-                setIsLoggedIn(true);
-            }
-        };
-        fetchSessionData();
-    }, []);
+    const handleLogOut = async () => {
+        await authClient.signOut();
+    };
 
     return (
-        <section className={cn("py-4", className)} suppressHydrationWarning={true}>
+        <section className={cn("py-4 sticky top-0 z-50 bg-background shadow-sm", className)} suppressHydrationWarning={true}>
             <div className="container mx-auto px-4">
                 {/* Desktop Menu */}
                 <nav className="hidden items-center justify-between lg:flex">
@@ -121,12 +120,27 @@ const Navbar = ({
                     </div>
                     <div className="flex gap-2">
                         <ModeToggle />
-                        <Button asChild variant="outline" size="sm">
-                            <Link href={auth.login.url}>{auth.login.title}</Link>
-                        </Button>
-                        <Button asChild size="sm">
-                            <Link href={auth.signup.url}>{auth.signup.title}</Link>
-                        </Button>
+                        {session?.user ? (
+                            <>
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={auth.dashboard.url}>Go to Dashboard</Link>
+                                </Button>
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={"/login"} onClick={handleLogOut}>
+                                        Logout
+                                    </Link>
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={auth.login.url}>{auth.login.title}</Link>
+                                </Button>
+                                <Button asChild size="sm">
+                                    <Link href={auth.signup.url}>{auth.signup.title}</Link>
+                                </Button>
+                            </>
+                        )}
                     </div>
                 </nav>
 
@@ -142,7 +156,7 @@ const Navbar = ({
                             />
                         </Link>
                         <Sheet>
-                            <SheetTrigger asChild>
+                            <SheetTrigger asChild id="navbar-dropdown-trigger">
                                 <Button variant="outline" size="icon">
                                     <Menu className="size-4" />
                                 </Button>
@@ -170,11 +184,18 @@ const Navbar = ({
                                     </Accordion>
 
                                     <div className="flex flex-col gap-3">
-                                        {isLoggedIn ? (
+                                        {session?.user ? (
                                             <>
                                                 <Button asChild variant="outline">
                                                     <Link href="/dashboard">
                                                         Go to Dashboard
+                                                    </Link>
+                                                </Button>
+                                                <Button asChild variant="outline" size="sm">
+                                                    <Link
+                                                        href={"/login"}
+                                                        onClick={handleLogOut}>
+                                                        Logout
                                                     </Link>
                                                 </Button>
                                             </>

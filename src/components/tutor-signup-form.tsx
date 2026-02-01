@@ -32,6 +32,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { useEffect, useState } from "react";
 import { getCategories } from "@/actions/categories.action";
 import { createTutorProfile } from "@/actions/tutor.action";
+import { toast } from "sonner";
 
 const TutorRegisterSchema = z.object({
     name: z
@@ -159,22 +160,30 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
             console.log("Validation Failed! Errors:", formApi.state.fieldMeta);
         },
         onSubmit: async ({ value }) => {
-            const tutorData: TutorFormData = {
-                name: value.name,
-                email: value.email,
-                role: value.role,
-                password: value.password,
-                profile: {
-                    bio: value.profile.bio,
-                    experienceYears: Number(value.profile.experienceYears),
-                    hourlyRate: Number(value.profile.hourlyRate),
-                    subjects: value.profile.subjects,
-                    category: value.profile.category,
-                    availabilities: value.profile.availabilities,
-                },
-            };
-            const response = await createTutorProfile(tutorData);
-            console.log("Tutor Profile Created:", response);
+            const toastId = toast.loading("Creating your tutor account...");
+            try {
+                const tutorData: TutorFormData = {
+                    name: value.name,
+                    email: value.email,
+                    role: value.role,
+                    password: value.password,
+                    profile: {
+                        bio: value.profile.bio,
+                        experienceYears: Number(value.profile.experienceYears),
+                        hourlyRate: Number(value.profile.hourlyRate),
+                        subjects: value.profile.subjects,
+                        category: value.profile.category,
+                        availabilities: value.profile.availabilities,
+                    },
+                };
+                const response = await createTutorProfile(tutorData);
+                toast.success("Tutor account created successfully!", { id: toastId });
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    return toast.error(`Failed to create account: ${error.message}`, { id: toastId });
+                }
+                toast.error("Failed to create account: Unknown error", { id: toastId });
+            }
         },
     });
 
@@ -456,7 +465,7 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                                                                         // রিমুভ লজিক
                                                                                         field.handleChange(
                                                                                             selectedValues.filter(
-                                                                                                (s) =>s !== option.value,
+                                                                                                (s) => s !== option.value,
                                                                                             ),
                                                                                         );
                                                                                     } else {
@@ -476,7 +485,7 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                                                                             ? "bg-primary text-primary-foreground"
                                                                                             : "opacity-50 [&_svg]:invisible",
                                                                                     )}>
-                                                                                    <Check className={cn("h-4 w-4")}/>
+                                                                                    <Check className={cn("h-4 w-4")} />
                                                                                 </div>
                                                                                 {option.label}
                                                                             </CommandItem>

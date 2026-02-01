@@ -1,12 +1,12 @@
 import { env } from "@/env";
 import { TutorFormData } from "@/types";
 
-interface ServiceOptions {
+export interface ServiceOptions {
     cache?: RequestCache;
     revalidate?: number;
 }
 
-interface GetTutorsParams {
+export interface GetTutorsParams {
     subject?: string;
     experienceYears?: number;
     hourlyRate?: number
