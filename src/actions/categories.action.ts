@@ -1,6 +1,6 @@
 "use server"
 
-import { tutorServices } from "@/Services/tutor.services"
+import { tutorServices } from "@/Services/tutor.service"
 
 export const getCategories = async () => {
     try {

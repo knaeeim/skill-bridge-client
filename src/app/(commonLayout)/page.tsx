@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, BookOpen, Clock, Star, ArrowRight, CheckCircle2 } from "lucide-react";
-import { tutorServices } from "@/Services/tutor.services";
+import { tutorServices } from "@/Services/tutor.service";
 import { Tutor } from "@/types";
 import { authClient } from "@/lib/auth-client";
 

@@ -1,4 +1,4 @@
-import { tutorServices } from '@/Services/tutor.services';
+import { tutorServices } from '@/Services/tutor.service';
 import React from 'react';
 
 const AllTutors = async () => {

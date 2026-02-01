@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Check, ChevronsUpDown, GraduationCap, Plus, Send, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "@tanstack/react-form";
-import { Category, Subjects } from "@/types";
+import { Category, Subjects, TutorFormData, UserRole } from "@/types";
 import { Textarea } from "./ui/textarea";
 import * as z from "zod";
 import { Popover, PopoverContent } from "./ui/popover";
@@ -31,6 +31,7 @@ import { Label } from "./ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { useEffect, useState } from "react";
 import { getCategories } from "@/actions/categories.action";
+import { createTutorProfile } from "@/actions/tutor.action";
 
 const TutorRegisterSchema = z.object({
     name: z
@@ -116,7 +117,7 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
             label: key.replace(/_/g, " "),
             value: key,
         }));
-    console.log(subjectOptions);
+
     const form = useForm({
         defaultValues: {
             name: "",
@@ -158,7 +159,24 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
             console.log("Validation Failed! Errors:", formApi.state.fieldMeta);
         },
         onSubmit: async ({ value }) => {
-            console.log(value);
+            
+            const tutorData : TutorFormData = {
+                name : value.name,
+                email : value.email,
+                role : value.role,
+                password : value.password, 
+                profile : {
+                    bio : value.profile.bio, 
+                    experienceYears : Number(value.profile.experienceYears),
+                    hourlyRate : Number(value.profile.hourlyRate),
+                    subjects : value.profile.subjects,
+                    category : value.profile.category,
+                    availabilities : value.profile.availabilities
+                }
+
+            }
+            const response = await createTutorProfile(tutorData);
+            console.log("Tutor Profile Created:", response);
         },
     });
 

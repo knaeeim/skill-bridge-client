@@ -1,4 +1,5 @@
 import { env } from "@/env";
+import { TutorFormData } from "@/types";
 
 interface ServiceOptions {
     cache?: RequestCache;
@@ -57,18 +58,39 @@ export const tutorServices = {
             }
             return { data: null, error: 'An unknown error occurred' }
         }
-    }, 
-    getAllCategories : async () => {
+    },
+    getAllCategories: async () => {
         try {
             const url = new URL(`${API_URL}/admin/all-categories`);
             const response = await fetch(url.toString());
             const data = await response.json();
             return { data: data, error: null }
-        } catch (error : unknown) {
-            if(error instanceof Error) {
+        } catch (error: unknown) {
+            if (error instanceof Error) {
                 return { data: null, error: error.message }
             }
             return { data: null, error: 'An unknown error occurred' }
+        }
+    },
+    createTutorProfile: async (tutorData: TutorFormData) => {
+        try {
+            const url = new URL(`${API_URL}/user/register`);
+            const response = await fetch(url.toString(), {
+                method : "POST", 
+                headers : {
+                    "Content-Type" : "application/json"
+                }, 
+                body : JSON.stringify(tutorData)
+            })
+            const data = await response.json();
+            return { data: data, error: null }
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return { data: null, error: error.message }
+            }
+            return {
+                data: null, error: 'An unknown error occurred'
+            }
         }
     }
 }

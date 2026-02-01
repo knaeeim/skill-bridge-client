@@ -21,7 +21,8 @@ import {
 } from "@/components/ui/sheet";
 import { ModeToggle } from "./ModeToggle";
 import Link from "next/link";
-import Image from "next/image";
+import { useEffect, useState } from "react";
+import { getSession } from "@/actions/getSession.action";
 
 interface MenuItem {
     title: string;
@@ -81,6 +82,18 @@ const Navbar = ({
     },
     className,
 }: Navbar1Props) => {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        const fetchSessionData = async () => {
+            const session = await getSession();
+            if (session?.data?.user) {
+                setIsLoggedIn(true);
+            }
+        };
+        fetchSessionData();
+    }, []);
+
     return (
         <section className={cn("py-4", className)} suppressHydrationWarning={true}>
             <div className="container mx-auto px-4">
@@ -157,16 +170,28 @@ const Navbar = ({
                                     </Accordion>
 
                                     <div className="flex flex-col gap-3">
-                                        <Button asChild variant="outline">
-                                            <Link href={auth.login.url}>
-                                                {auth.login.title}
-                                            </Link>
-                                        </Button>
-                                        <Button asChild>
-                                            <Link href={auth.signup.url}>
-                                                {auth.signup.title}
-                                            </Link>
-                                        </Button>
+                                        {isLoggedIn ? (
+                                            <>
+                                                <Button asChild variant="outline">
+                                                    <Link href="/dashboard">
+                                                        Go to Dashboard
+                                                    </Link>
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Button asChild variant="outline">
+                                                    <Link href={auth.login.url}>
+                                                        {auth.login.title}
+                                                    </Link>
+                                                </Button>
+                                                <Button asChild>
+                                                    <Link href={auth.signup.url}>
+                                                        {auth.signup.title}
+                                                    </Link>
+                                                </Button>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </SheetContent>

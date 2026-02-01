@@ -82,8 +82,25 @@ export interface Tutor {
         isFeatured: boolean;
         category: Category[];
         subjects: Subjects[];
-        availabilities : AvailabilitySlot[];
+        availabilities: AvailabilitySlot[];
         createdAt: string;
         updatedAt: string;
+    }
+}
+
+export interface TutorFormData {
+    name: string;
+    email: string;
+    password: string;
+    image?: string | null;
+    role: string;
+    phone?: string | null;
+    profile: {
+        bio: string;
+        experienceYears: number;
+        hourlyRate: number;
+        category: string[];
+        subjects: string[];
+        availabilities: AvailabilitySlot[];
     }
 }
