@@ -12,6 +12,11 @@ import {
     SidebarRail,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { Route } from "@/types";
+import { Roles } from "@/proxy";
+import { adminRoutes } from "@/routes/adminRoutes";
+import { tutorRoutes } from "@/routes/tutorRoutes";
+import { studentRoutes } from "@/routes/studentRoutes";
 
 // This is sample data.
 const data = {
@@ -39,13 +44,30 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 }
 
 export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
+    let routes: Route[] = [];
+
+    switch (userRole) {
+        case Roles.admin:
+            routes = adminRoutes;
+            break;
+        case Roles.tutor:
+            routes = tutorRoutes;
+            break;
+        case Roles.student:
+            routes = studentRoutes;
+            break;
+        default:
+            routes = [];
+            break;
+    }
+
     return (
         <Sidebar {...props}>
             <SidebarHeader>
                 <h1 className="text-lg m-3 font-bold text-muted-foreground">
-                    {userRole === "ADMIN"
+                    {userRole === Roles.admin
                         ? "Admin"
-                        : userRole === "TUTOR"
+                        : userRole === Roles.tutor
                           ? "Tutor"
                           : "Student"}{" "}
                     Dashboard
@@ -53,7 +75,7 @@ export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
             </SidebarHeader>
             <SidebarContent>
                 {/* We create a SidebarGroup for each parent. */}
-                {data.navMain.map((item) => (
+                {routes.map((item) => (
                     <SidebarGroup key={item.title}>
                         <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
                         <SidebarGroupContent>

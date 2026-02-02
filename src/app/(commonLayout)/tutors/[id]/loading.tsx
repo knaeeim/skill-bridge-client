@@ -19,7 +19,7 @@ export default function Loading() {
                     <div className="flex-1 space-y-8">
                         {/* Profile Header Card */}
                         <Card className="border-none shadow-lg">
-                            <CardContent className="pt-6">
+                            <CardContent className="pt-6"> 
                                 <div className="flex flex-col sm:flex-row gap-6 items-start">
                                     {/* Avatar Skeleton */}
                                     <div className="relative">
