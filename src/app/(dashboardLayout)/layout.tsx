@@ -9,9 +9,21 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { sessionService } from "@/Services/session.service";
 import { ReactNode } from "react";
 
-export default function DashboardLayout({ admin, tutor, student }: { admin: ReactNode, tutor: ReactNode, student: ReactNode  }) {
+export default async function DashboardLayout({
+    admin,
+    tutor,
+    student,
+}: {
+    admin: ReactNode;
+    tutor: ReactNode;
+    student: ReactNode;
+}) {
+    const { data } = await sessionService.getSession();
+    const userRole = data?.user.role;
+
     return (
         <SidebarProvider>
             <AppSidebar />
@@ -37,9 +49,11 @@ export default function DashboardLayout({ admin, tutor, student }: { admin: Reac
                     </Breadcrumb>
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4">
-                    {admin}
-                    {tutor}
-                    {student}
+                    {userRole.role === "ADMIN"
+                        ? admin
+                        : userRole.role === "TUTOR"
+                          ? tutor
+                          : student}
                 </div>
             </SidebarInset>
         </SidebarProvider>
