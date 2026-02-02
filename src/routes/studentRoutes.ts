@@ -16,7 +16,7 @@ export const studentRoutes: Route[] = [
         items: [
             {
                 title: "My Bookings",
-                url: "/student-dashboard/bookings"
+                url: "/student-dashboard/my-bookings"
             }
         ]
     },
