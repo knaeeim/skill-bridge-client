@@ -25,7 +25,10 @@ import { authClient } from "@/lib/auth-client";
 import { Separator } from "@/components/ui/separator"; // Make sure to install this: npx shadcn@latest add separator
 
 export default async function Home() {
-    const { data: tutors } = await tutorServices.getAllTutors();
+    const { data: tutors } = await tutorServices.getAllTutors(
+        { isFeatured: "true" },
+        { cache: "no-store" },
+    );
     // const session = await authClient.getSession(); // Uncomment if needed
 
     return (
@@ -174,7 +177,7 @@ export default async function Home() {
                                 </CardContent>
                                 <CardFooter className="px-6 pb-6 pt-0">
                                     <Button className="w-full" asChild>
-                                        <Link href={`/tutors/${tutor.id}`}>Book Session</Link>
+                                        <Link href={`/tutors/${tutor.id}`}>View Details</Link>
                                     </Button>
                                 </CardFooter>
                             </Card>

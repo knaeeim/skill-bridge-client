@@ -28,35 +28,35 @@ export interface AvailabilitySlot {
 
 export enum Subjects {
     // General
-    MATH,
-    ENGLISH,
-    SCIENCE,
+    MATH = "MATH",
+    ENGLISH = "ENGLISH",
+    SCIENCE = "SCIENCE",
 
     // Specific Math
-    CALCULUS,
-    ALGEBRA,
-    GEOMETRY,
+    CALCULUS = "CALCULUS",
+    ALGEBRA = "ALGEBRA",
+    GEOMETRY = "GEOMETRY",
 
     // Science
-    PHYSICS,
-    CHEMISTRY,
-    BIOLOGY,
-    ICT,
+    PHYSICS = "PHYSICS",
+    CHEMISTRY = "CHEMISTRY",
+    BIOLOGY = "BIOLOGY",
+    ICT = "ICT",
 
     // Business
-    ACCOUNTING,
-    FINANCE,
-    ECONOMICS,
-    MARKETING,
+    ACCOUNTING = "ACCOUNTING",
+    FINANCE = "FINANCE",
+    ECONOMICS = "ECONOMICS",
+    MARKETING = "MARKETING",
 
     // Tech
-    PROGRAMMING,
-    WEB_DEVELOPMENT,
-    DATA_SCIENCE,
+    PROGRAMMING = "PROGRAMMING",
+    WEB_DEVELOPMENT = "WEB_DEVELOPMENT",
+    DATA_SCIENCE = "DATA_SCIENCE",
 
     // Prep
-    IELTS,
-    ADMISSION_TEST
+    IELTS = "IELTS",
+    ADMISSION_TEST = "ADMISSION_TEST"
 }
 
 export interface Tutor {

@@ -1,5 +1,6 @@
 import { env } from "@/env";
 import { TutorFormData } from "@/types";
+import { cx } from "class-variance-authority";
 
 export interface ServiceOptions {
     cache?: RequestCache;
@@ -50,7 +51,7 @@ export const tutorServices = {
 
             const response = await fetch(url.toString(), config);
             const data = await response.json();
-
+            
             return { data: data, error: null }
         } catch (error: unknown) {
             if (error instanceof Error) {
@@ -76,13 +77,14 @@ export const tutorServices = {
         try {
             const url = new URL(`${API_URL}/user/register`);
             const response = await fetch(url.toString(), {
-                method : "POST", 
-                headers : {
-                    "Content-Type" : "application/json"
-                }, 
-                body : JSON.stringify(tutorData)
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(tutorData)
             })
             const data = await response.json();
+            console.log(data);
             return { data: data, error: null }
         } catch (error: unknown) {
             if (error instanceof Error) {
@@ -91,6 +93,22 @@ export const tutorServices = {
             return {
                 data: null, error: 'An unknown error occurred'
             }
+        }
+    },
+    getTutorProfile: async (tutorId: string) => {
+        try {
+            const url = new URL(`${API_URL}/tutor/profile/${tutorId}`);
+            const response = await fetch(url.toString(), {
+                cache: 'no-store'
+            });
+            const data = await response.json();
+            // console.log(data);
+            return { data: data, error: null };
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                throw new Error(error.message);
+            }
+            throw new Error('An unknown error occurred');
         }
     }
 }

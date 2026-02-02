@@ -55,7 +55,7 @@ const TutorRegisterSchema = z.object({
         subjects: z.array(z.string()),
         availabilities: z.array(
             z.object({
-                daysOfWeek: z.array(z.string()).min(1, "At least one day must be selected"),
+                dayOfWeek: z.array(z.string()).min(1, "At least one day must be selected"),
                 startTime: z.string().min(1, "Start time is required"),
                 endTime: z.string().min(1, "End time is required"),
             }),
@@ -112,9 +112,7 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
         fetchData();
     }, []);
 
-    const subjectOptions = Object.keys(Subjects)
-        .filter((key) => isNaN(Number(key)))
-        .map((key) => ({
+    const subjectOptions = Object.values(Subjects).map((key) => ({
             label: key.replace(/_/g, " "),
             value: key,
         }));
@@ -132,12 +130,12 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                 subjects: [] as string[],
                 availabilities: [
                     {
-                        daysOfWeek: [] as string[],
+                        dayOfWeek: [] as string[],
                         startTime: "",
                         endTime: "",
                     },
                 ] as {
-                    daysOfWeek: string[];
+                    dayOfWeek: string[];
                     startTime: string;
                     endTime: string;
                 }[],
@@ -162,6 +160,7 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
         onSubmit: async ({ value }) => {
             const toastId = toast.loading("Creating your tutor account...");
             try {
+                console.log(value);
                 const tutorData: TutorFormData = {
                     name: value.name,
                     email: value.email,
@@ -524,7 +523,7 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                         onClick={() => {
                                             // নতুন খালি স্লট যোগ করা
                                             form.pushFieldValue("profile.availabilities", {
-                                                daysOfWeek: [],
+                                                dayOfWeek: [],
                                                 startTime: "10:00 AM",
                                                 endTime: "06:00 PM",
                                             });
@@ -557,7 +556,7 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
 
                                                             {/* ১. দিনের সিলেকশন (Day Selector) */}
                                                             <form.Field
-                                                                name={`profile.availabilities[${index}].daysOfWeek`}
+                                                                name={`profile.availabilities[${index}].dayOfWeek`}
                                                                 children={(dayField) => (
                                                                     <div className="space-y-2">
                                                                         <Label>
