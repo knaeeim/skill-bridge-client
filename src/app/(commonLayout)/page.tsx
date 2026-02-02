@@ -147,7 +147,7 @@ export default async function Home() {
                                 key={tutor.id}
                                 className="overflow-hidden hover:border-primary transition-colors">
                                 <CardHeader className="p-0">
-                                    <div className="h-24 bg-gradient-to-r from-blue-500 to-cyan-500 relative"></div>
+                                    <div className="h-24 bg-linear-to-r from-blue-500 to-cyan-500 relative"></div>
                                     <div className="px-6 -mt-10">
                                         <Avatar className="h-20 w-20 border-4 border-background">
                                             <AvatarImage src={tutor.image || ""} />

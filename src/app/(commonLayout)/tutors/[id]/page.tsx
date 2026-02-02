@@ -109,7 +109,7 @@ const TutorDetailsPage = async (props: Props) => {
         <div className="min-h-screen bg-background pb-20">
             {/* --- HERO HEADER --- */}
             <div className="relative h-64 md:h-80 w-full overflow-hidden bg-slate-950">
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600 opacity-90" />
+                <div className="absolute inset-0 bg-linear-to-r from-violet-600 to-indigo-600 opacity-90" />
                 <div className="absolute top-6 left-4 md:left-8 z-20">
                     <Button
                         variant="ghost"
@@ -205,7 +205,7 @@ const TutorDetailsPage = async (props: Props) => {
 
                         {/* Tabs */}
                         <Tabs defaultValue="about" className="w-full">
-                            <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+                            <TabsList className="grid w-full grid-cols-3 lg:w-100">
                                 <TabsTrigger value="about">About</TabsTrigger>
                                 <TabsTrigger value="reviews">Reviews</TabsTrigger>
                                 <TabsTrigger value="schedule">Availability</TabsTrigger>
@@ -332,7 +332,7 @@ const TutorDetailsPage = async (props: Props) => {
                     </div>
 
                     {/* --- RIGHT SIDEBAR --- */}
-                    <div className="w-full md:w-[350px] space-y-6">
+                    <div className="w-full md:w-87.5 space-y-6">
                         <div className="sticky top-24">
                             <Card className="shadow-lg border-t-4 border-t-primary">
                                 <CardHeader>

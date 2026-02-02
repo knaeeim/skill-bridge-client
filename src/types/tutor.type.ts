@@ -21,7 +21,7 @@ export interface Category {
 }
 
 export interface AvailabilitySlot {
-    daysOfWeek: string[]; // e.g. ["MONDAY", "TUESDAY"]
+    dayOfWeek: string[]; // e.g. ["MONDAY", "TUESDAY"]
     startTime: string;
     endTime: string;
 }
