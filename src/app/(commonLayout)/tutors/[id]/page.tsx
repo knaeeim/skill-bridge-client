@@ -23,6 +23,7 @@ import {
     CheckCircle2,
 } from "lucide-react";
 import BookingSection from "./BookingModal";
+import { sessionService } from "@/Services/session.service";
 
 // ১. আপনার JSON ডাটা অনুযায়ী ইন্টারফেস (Exact Match)
 interface TutorResponse {
@@ -63,33 +64,7 @@ const formatSubject = (subject: any) => {
 };
 
 const TutorDetailsPage = async (props: Props) => {
-    // const { id } = useParams();
-
-    // const [isLoading, setIsLoading] = useState(true);
-    // const [tutorData, setTutorData] = useState<TutorResponse | null>(null);
-    // const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-
-    // useEffect(() => {
-    //     const fetchTutor = async () => {
-    //         try {
-    //             const tutorId = Array.isArray(id) ? id[0] : id;
-    //             if (!tutorId) return;
-    //             const { data } = await getTutorDetails(tutorId);
-    //             if (data) {
-    //                 setTutorData(data.data);
-    //             }
-    //         } catch (error: unknown) {
-    //             console.log("An Error Occured in TutorDetails Details");
-    //         } finally {
-    //             setIsLoading(false);
-    //         }
-    //     };
-    //     fetchTutor();
-    // }, [id]);
-
-    // if (isLoading) {
-    //     return <Loading />;
-    // }
+    const session = await sessionService.getSession();
     const params = await props.params;
     const { id } = params;
 
@@ -390,10 +365,12 @@ const TutorDetailsPage = async (props: Props) => {
                                         Book a Session
                                     </Button> */}
                                     <BookingSection
-                                        tutorId={tutorData.id}
+                                        tutorId={tutorData.user.id}
                                         hourlyRate={hourlyRate}
                                         tutorName={user.name}
                                         availabilities={tutorData.availabilities || []}
+                                        studentId={session.data.user?.id}
+                                        subjects={tutorData.subjects || []}
                                     />
 
                                     <Button variant="outline" className="w-full">

@@ -1,7 +1,7 @@
 'use server'
 
 import { currentUserService } from "@/Services/curentUser.service";
-import { StudentFormData, studentService } from "@/Services/student.service";
+import { BookingPayload, StudentFormData, studentService } from "@/Services/student.service";
 
 export async function createStudentProfileAction(studentData: StudentFormData) {
     const response = await studentService.createStudent(studentData);
@@ -16,4 +16,16 @@ export async function updateStudentProfileAction(userId: string, profileData: {n
 export async function getCurrentUserStudentAction(){
     const response = await currentUserService.getCurrentUserStudent();
     return response;
+}
+
+export async function createStudentBookingAction(bookingData: BookingPayload) {
+    try {
+        const response = await studentService.createBooking(bookingData);
+        return response;
+    } catch (error : unknown) {
+        if(error instanceof Error) {
+            return { data: null, error: error.message }
+        }
+        return { data: null, error: 'An unknown error occurred' }
+    }
 }

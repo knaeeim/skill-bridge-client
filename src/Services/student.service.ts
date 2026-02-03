@@ -11,6 +11,16 @@ export interface StudentFormData {
     }
 }
 
+export interface BookingPayload {
+    studentId: string;
+    tutorId: string;
+    subject: string;
+    date: string;      // format: "YYYY-MM-DD"
+    startTime: string; // "10:00 PM"
+    endTime: string;   // "11:00 PM"
+    price: number;
+}
+
 const API_URL = env.API_URL;
 
 export const studentService = {
@@ -50,7 +60,7 @@ export const studentService = {
     },
     getStudentBooking: async () => {
         try {
-            const url = new URL(`${API_URL}/booking/all-bookings`);
+            const url = new URL(`${API_URL}/booking/user-bookings`);
             const cookieStore = await cookies();
             const response = await fetch(url.toString(), {
                 cache: 'no-store',
@@ -88,5 +98,28 @@ export const studentService = {
             return { data: null, error: 'An unknown error occurred' }
         }
     },
+
+    createBooking: async (bookingData: BookingPayload) => {
+        try {
+            const url = new URL(`${API_URL}/booking/create-booking`);
+            const cookieStore = await cookies();
+            const response = await fetch(url.toString(), {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Cookie: cookieStore.toString(),
+                },
+                body: JSON.stringify(bookingData)
+            })
+            const data = await response.json();
+            console.log(data);
+            return { data: data, error: null }
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return { data: null, error: error.message }
+            }
+            return { data: null, error: 'An unknown error occurred' }
+        }
+    }
 
 }
