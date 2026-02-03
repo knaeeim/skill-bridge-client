@@ -6,7 +6,7 @@ const API_URL = env.API_URL;
 export const currentUserService = {
     getCurrentUserStudent: async () => {
         try {
-            const url = new URL(`${API_URL}/student/current-user`);
+            const url = new URL(`${API_URL}/user/current-user`);
             const cookieStore = await cookies();
             const response = await fetch(url.toString(), {
                 cache: 'no-store',

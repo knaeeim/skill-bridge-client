@@ -1,6 +1,7 @@
 import { env } from "@/env";
 import { TutorFormData } from "@/types";
 import { cx } from "class-variance-authority";
+import { cookies } from "next/headers";
 
 export interface ServiceOptions {
     cache?: RequestCache;
@@ -15,6 +16,7 @@ export interface GetTutorsParams {
     page?: number;
     limit?: number;
     isFeatured?: string;
+    isApproved?: string;
 }
 
 const API_URL = env.API_URL;
@@ -51,7 +53,7 @@ export const tutorServices = {
 
             const response = await fetch(url.toString(), config);
             const data = await response.json();
-            
+
             return { data: data, error: null }
         } catch (error: unknown) {
             if (error instanceof Error) {
@@ -109,6 +111,26 @@ export const tutorServices = {
                 throw new Error(error.message);
             }
             throw new Error('An unknown error occurred');
+        }
+    },
+
+    getTutorStats: async () => {
+        try {
+            const url = new URL(`${API_URL}/tutor/tutor-stats`);
+            const cookieStore = await cookies();
+            const response = await fetch(url.toString(), {
+                cache: "no-store",
+                headers: {
+                    Cookie: cookieStore.toString()
+                }
+            })
+            const data = await response.json();
+            return { data: data, error: null }
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return { data: null, error: error.message }
+            }
+            return { data: null, error: 'An unknown error occurred' }
         }
     }
 }

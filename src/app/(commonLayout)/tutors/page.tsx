@@ -29,7 +29,7 @@ const AllTutors = () => {
         const fetchTutors = async () => {
             try {
                 // Assuming getAllTutors returns { data: Tutor[] }
-                const {data, error} = await getAllTutors({});
+                const {data, error} = await getAllTutors({ isApproved : true });
                 setTutors(data.data);
             } catch (error) {
                 console.error("Failed to fetch tutors", error);
@@ -83,7 +83,7 @@ const AllTutors = () => {
             </div>
 
             {/* Grid Layout */}
-            {tutors.length > 0 ? (
+            {tutors?.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {tutors.map((tutor) => (
                         <TutorCard key={tutor.id} tutor={tutor} />

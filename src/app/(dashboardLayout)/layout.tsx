@@ -38,9 +38,9 @@ export default async function DashboardLayout({
                     </h1>
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4">
-                    {userRole.role === "ADMIN"
+                    {userRole === "ADMIN"
                         ? admin
-                        : userRole.role === "TUTOR"
+                        : userRole === "TUTOR"
                           ? tutor
                           : student}
                 </div>

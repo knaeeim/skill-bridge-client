@@ -21,7 +21,6 @@ import {
 } from "lucide-react"; // Added Social Icons
 import { tutorServices } from "@/Services/tutor.service";
 import { Tutor } from "@/types";
-import { authClient } from "@/lib/auth-client";
 import { Separator } from "@/components/ui/separator"; // Make sure to install this: npx shadcn@latest add separator
 
 export default async function Home() {
