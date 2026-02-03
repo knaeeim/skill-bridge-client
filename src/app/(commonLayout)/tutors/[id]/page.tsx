@@ -22,6 +22,7 @@ import {
     Book,
     CheckCircle2,
 } from "lucide-react";
+import BookingSection from "./BookingModal";
 
 // ১. আপনার JSON ডাটা অনুযায়ী ইন্টারফেস (Exact Match)
 interface TutorResponse {
@@ -62,6 +63,33 @@ const formatSubject = (subject: any) => {
 };
 
 const TutorDetailsPage = async (props: Props) => {
+    // const { id } = useParams();
+
+    // const [isLoading, setIsLoading] = useState(true);
+    // const [tutorData, setTutorData] = useState<TutorResponse | null>(null);
+    // const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+
+    // useEffect(() => {
+    //     const fetchTutor = async () => {
+    //         try {
+    //             const tutorId = Array.isArray(id) ? id[0] : id;
+    //             if (!tutorId) return;
+    //             const { data } = await getTutorDetails(tutorId);
+    //             if (data) {
+    //                 setTutorData(data.data);
+    //             }
+    //         } catch (error: unknown) {
+    //             console.log("An Error Occured in TutorDetails Details");
+    //         } finally {
+    //             setIsLoading(false);
+    //         }
+    //     };
+    //     fetchTutor();
+    // }, [id]);
+
+    // if (isLoading) {
+    //     return <Loading />;
+    // }
     const params = await props.params;
     const { id } = params;
 
@@ -102,8 +130,6 @@ const TutorDetailsPage = async (props: Props) => {
     if (!user) {
         return <div>Error: User information missing for this tutor profile.</div>;
     }
-
-    console.log(tutorData);
 
     return (
         <div className="min-h-screen bg-background pb-20">
@@ -358,9 +384,18 @@ const TutorDetailsPage = async (props: Props) => {
                                         </div>
                                     </div>
 
-                                    <Button className="w-full h-12 text-lg font-semibold shadow-md">
+                                    {/* <Button
+                                        onClick={() => setIsBookingModalOpen(true)}
+                                        className="w-full h-12 text-lg font-semibold shadow-md">
                                         Book a Session
-                                    </Button>
+                                    </Button> */}
+                                    <BookingSection
+                                        tutorId={tutorData.id}
+                                        hourlyRate={hourlyRate}
+                                        tutorName={user.name}
+                                        availabilities={tutorData.availabilities || []}
+                                    />
+
                                     <Button variant="outline" className="w-full">
                                         Send Message
                                     </Button>

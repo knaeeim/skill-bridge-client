@@ -47,24 +47,46 @@ export const studentService = {
             }
             return { data: null, error: 'An unknown error occurred' }
         }
-    }, 
-    getStudentBooking : async () => {
+    },
+    getStudentBooking: async () => {
         try {
             const url = new URL(`${API_URL}/booking/all-bookings`);
             const cookieStore = await cookies();
             const response = await fetch(url.toString(), {
                 cache: 'no-store',
-                headers : {
-                    Cookie : cookieStore.toString()
-                }             
+                headers: {
+                    Cookie: cookieStore.toString()
+                }
             })
             const data = await response.json();
             return { data: data, error: null }
-        } catch (error : unknown) {
-            if(error instanceof Error){
+        } catch (error: unknown) {
+            if (error instanceof Error) {
                 return { data: null, error: error.message }
             }
             return { data: null, error: 'An unknown error occurred' }
         }
-    }
+    },
+    updateStudentProfile: async (userId: string, profileData: { name?: string, image?: string, bio?: string }) => {
+        try {
+            const url = new URL(`${API_URL}/student/update-student-profile/${userId}`);
+            const cookieStore = await cookies();
+            const response = await fetch(url.toString(), {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Cookie: cookieStore.toString(),
+                },
+                body: JSON.stringify(profileData)
+            })
+            const data = await response.json();
+            return { data: data, error: null }
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return { data: null, error: error.message }
+            }
+            return { data: null, error: 'An unknown error occurred' }
+        }
+    },
+
 }
