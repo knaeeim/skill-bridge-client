@@ -33,6 +33,7 @@ interface BookingSectionProps {
     availabilities: Availability[];
     subjects: string[];
     studentId: string;
+    role: string;
 }
 
 // --- Utility Functions ---
@@ -86,6 +87,7 @@ export default function BookingSection({
     availabilities,
     subjects,
     studentId,
+    role
 }: BookingSectionProps) {
     const [open, setOpen] = useState(false);
 
@@ -167,7 +169,7 @@ export default function BookingSection({
     return (
         <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger asChild>
-                <Button className="w-full h-12 text-lg font-semibold shadow-md">
+                <Button disabled={role === "TUTOR" ? true : false} className="w-full h-12 text-lg font-semibold shadow-md">
                     Book a Session
                 </Button>
             </AlertDialogTrigger>

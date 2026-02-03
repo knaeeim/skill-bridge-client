@@ -29,7 +29,7 @@ const AllTutors = () => {
         const fetchTutors = async () => {
             try {
                 // Assuming getAllTutors returns { data: Tutor[] }
-                const {data, error} = await getAllTutors({ isApproved : true });
+                const {data, error} = await getAllTutors({ isApproved : "true" });
                 setTutors(data.data);
             } catch (error) {
                 console.error("Failed to fetch tutors", error);

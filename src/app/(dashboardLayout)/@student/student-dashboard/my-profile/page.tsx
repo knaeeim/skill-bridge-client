@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { User, Mail, Pencil, Save, X, ImageIcon, Loader2 } from "lucide-react";
 import {
-    getCurrentUserStudentAction,
+    getCurrentUserAction,
     updateStudentProfileAction,
 } from "@/actions/student.action";
 
@@ -36,7 +36,7 @@ const StudentProfilePage = () => {
     const fetchProfile = async () => {
         try {
             setLoading(true);
-            const res = await getCurrentUserStudentAction();
+            const res = await getCurrentUserAction();
             // আপনার রেসপন্স স্ট্রাকচার { data: { success: true, data: user } }
             if (res.data?.success) {
                 const userData = res.data.data;

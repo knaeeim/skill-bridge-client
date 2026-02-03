@@ -51,7 +51,7 @@ interface UserData {
 const TutorDashboardPage = async () => {
     // 1. Fetch Data
     const [userRes, statsRes] = await Promise.all([
-        currentUserService.getCurrentUserStudent(),
+        currentUserService.getCurrentUser(),
         tutorServices.getTutorStats()
     ]);
 

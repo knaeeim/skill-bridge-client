@@ -33,7 +33,7 @@ export const tutorRoutes : Route[] = [
         items : [
             {
                 title : "My Bookings", 
-                url : "/tutor-dashboard/bookings"
+                url : "/tutor-dashboard/my-bookings"
             }
         ]
     }

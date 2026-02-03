@@ -99,6 +99,7 @@ const TutorDetailsPage = async (props: Props) => {
         // নিচের গুলো না থাকলে ডিফল্ট ভ্যালু বা empty array
         category = [],
         availabilities = [],
+        isApproved,
     } = tutorData;
 
     // ৫. User অবজেক্ট চেক (Safety Check)
@@ -194,9 +195,7 @@ const TutorDetailsPage = async (props: Props) => {
                                             </div>
                                             <div className="flex items-center gap-1">
                                                 <Globe className="h-4 w-4" />
-                                                {user.emailVerified
-                                                    ? "Verified"
-                                                    : "Unverified"}
+                                                {isApproved ? "Verified" : "Unverified"}
                                             </div>
                                         </div>
                                     </div>
@@ -371,6 +370,7 @@ const TutorDetailsPage = async (props: Props) => {
                                         availabilities={tutorData.availabilities || []}
                                         studentId={session.data.user?.id}
                                         subjects={tutorData.subjects || []}
+                                        role={session.data.user?.role}
                                     />
 
                                     <Button variant="outline" className="w-full">

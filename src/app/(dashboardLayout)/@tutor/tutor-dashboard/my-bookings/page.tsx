@@ -1,30 +1,38 @@
 import React from "react";
-import { studentService } from "@/Services/student.service";
+import { tutorServices } from "@/Services/tutor.service";
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { CalendarDays, Clock, BookOpen, MoreHorizontal, Video } from "lucide-react";
+import {
+    CalendarDays,
+    Clock,
+    BookOpen,
+    MoreHorizontal,
+    Check,
+    X,
+    User,
+    Banknote,
+} from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { sessionService } from "@/Services/session.service";
 
-// 1. Updated Type Definitions based on your JSON
+// 1. Type Definitions matching your JSON
 interface UserProfile {
     id: string;
     name: string;
@@ -39,22 +47,20 @@ interface Booking {
     studentId: string;
     tutorId: string;
     subject: string;
-    date: string; // "2026-02-04T00:00:00.000Z"
-    startTime: string; // "5:30 PM"
-    endTime: string; // "6:30 PM"
+    date: string;
+    startTime: string;
+    endTime: string;
     price: number;
-    status: string; // "CONFIRMED"
-    createdAt: string;
-    updatedAt: string;
-    tutor: UserProfile; // Nested Tutor Object
-    student: UserProfile;
+    status: string;
+    student: UserProfile; // We need Student info for Tutor View
 }
 
-const StudentAllBookings = async () => {
+const TutorsBookingPage = async () => {
     // 2. Fetch Data
-    const response = await studentService.getStudentBooking();
+    const response = await tutorServices.getTutorBooking();
 
-    // Extract data safely based on your JSON structure: { data: { success: true, data: [...] } }
+    // FIX: Access data.data just like your Student Component
+    // response.data (Axios body) -> .data (The array inside your JSON)
     const bookings: Booking[] = response.data?.data || [];
 
     // 3. Status Badge Helper
@@ -90,13 +96,13 @@ const StudentAllBookings = async () => {
         <div className="container mx-auto py-8 space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">My Bookings</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">Booking Requests</h1>
                     <p className="text-muted-foreground">
-                        Manage your upcoming and past tuition sessions.
+                        Manage incoming requests and scheduled classes.
                     </p>
                 </div>
                 <Badge variant="secondary" className="px-4 py-1 text-sm">
-                    Total Sessions: {bookings.length}
+                    Total: {bookings.length}
                 </Badge>
             </div>
 
@@ -107,7 +113,7 @@ const StudentAllBookings = async () => {
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-muted/50">
-                                        <TableHead className="w-62.5">Tutor</TableHead>
+                                        <TableHead className="w-75">Student</TableHead>
                                         <TableHead>Subject</TableHead>
                                         <TableHead>Date & Time</TableHead>
                                         <TableHead>Price</TableHead>
@@ -120,51 +126,57 @@ const StudentAllBookings = async () => {
                                         <TableRow
                                             key={booking.id}
                                             className="hover:bg-muted/5">
-                                            {/* Tutor Column (Avatar + Name) */}
+                                            {/* Student Column */}
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
                                                     <Avatar className="h-10 w-10 border">
                                                         <AvatarImage
-                                                            src={booking.tutor.image || ""}
-                                                            alt={booking.tutor.name}
+                                                            className="object-cover object-top"
+                                                            src={booking.student?.image || ""}
+                                                            alt={booking.student?.name}
                                                         />
-                                                        <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                                                            {booking.tutor.name[0]}
+                                                        <AvatarFallback className="bg-blue-50 text-blue-600 font-bold">
+                                                            {booking.student?.name?.[0] || "S"}
                                                         </AvatarFallback>
                                                     </Avatar>
                                                     <div className="flex flex-col">
                                                         <span className="font-semibold text-sm">
-                                                            {booking.tutor.name}
+                                                            {booking.student?.name ||
+                                                                "Unknown"}
                                                         </span>
                                                         <span className="text-xs text-muted-foreground">
-                                                            {booking.tutor.email}
+                                                            {booking.student?.email}
                                                         </span>
                                                     </div>
                                                 </div>
                                             </TableCell>
 
-                                            {/* Subject */}
+                                            {/* Subject Column */}
                                             <TableCell>
                                                 <div className="flex items-center gap-2">
-                                                    <div className="bg-blue-50 p-1.5 rounded text-blue-600">
+                                                    <div className="bg-orange-50 p-1.5 rounded text-orange-600">
                                                         <BookOpen className="h-4 w-4" />
                                                     </div>
                                                     <span className="font-medium capitalize text-sm">
-                                                        {booking.subject.toLowerCase()}
+                                                        {booking.subject
+                                                            ?.replace(/_/g, " ")
+                                                            .toLowerCase()}
                                                     </span>
                                                 </div>
                                             </TableCell>
 
-                                            {/* Schedule */}
+                                            {/* Schedule Column */}
                                             <TableCell>
                                                 <div className="flex flex-col gap-1">
                                                     <div className="flex items-center gap-2 text-sm">
                                                         <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
                                                         <span>
-                                                            {format(
-                                                                new Date(booking.date),
-                                                                "EEE, dd MMM yyyy",
-                                                            )}
+                                                            {booking.date
+                                                                ? format(
+                                                                      new Date(booking.date),
+                                                                      "EEE, dd MMM yyyy",
+                                                                  )
+                                                                : "N/A"}
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -179,12 +191,14 @@ const StudentAllBookings = async () => {
 
                                             {/* Price */}
                                             <TableCell>
-                                                <span className="font-mono font-medium">
-                                                    ৳{booking.price.toLocaleString()}
-                                                </span>
+                                                <div className="flex items-center gap-1 font-mono font-medium text-sm">
+                                                    <span>
+                                                        ৳{booking.price?.toLocaleString()}
+                                                    </span>
+                                                </div>
                                             </TableCell>
 
-                                            {/* Status */}
+                                            {/* Status Badge */}
                                             <TableCell>
                                                 {getStatusBadge(booking.status)}
                                             </TableCell>
@@ -207,17 +221,15 @@ const StudentAllBookings = async () => {
                                                             Actions
                                                         </DropdownMenuLabel>
                                                         <DropdownMenuItem>
-                                                            View Details
+                                                            <User className="mr-2 h-4 w-4" />{" "}
+                                                            View Profile
                                                         </DropdownMenuItem>
+
                                                         {booking.status === "CONFIRMED" && (
-                                                            <DropdownMenuItem className="text-blue-600">
-                                                                <Video className="mr-2 h-4 w-4" />{" "}
-                                                                Join Meeting
+                                                            <DropdownMenuItem className="text-red-600 focus:text-red-600">
+                                                                Cancel Class
                                                             </DropdownMenuItem>
                                                         )}
-                                                        <DropdownMenuItem className="text-red-600 focus:text-red-600">
-                                                            Cancel Booking
-                                                        </DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </TableCell>
@@ -227,14 +239,15 @@ const StudentAllBookings = async () => {
                             </Table>
                         </div>
                     ) : (
+                        // Empty State
                         <div className="flex flex-col items-center justify-center py-16 text-center border rounded-md bg-background">
                             <div className="bg-muted/50 p-4 rounded-full mb-4">
-                                <BookOpen className="h-8 w-8 text-muted-foreground" />
+                                <CalendarDays className="h-8 w-8 text-muted-foreground" />
                             </div>
-                            <h3 className="text-lg font-semibold">No bookings found</h3>
+                            <h3 className="text-lg font-semibold">No booking requests</h3>
                             <p className="text-muted-foreground max-w-sm mt-2">
-                                You haven't booked any tuition sessions yet. Find a tutor to
-                                get started.
+                                You don't have any upcoming classes or pending requests from
+                                students yet.
                             </p>
                         </div>
                     )}
@@ -244,4 +257,4 @@ const StudentAllBookings = async () => {
     );
 };
 
-export default StudentAllBookings;
+export default TutorsBookingPage;

@@ -13,8 +13,8 @@ export async function updateStudentProfileAction(userId: string, profileData: {n
     return response;
 }
 
-export async function getCurrentUserStudentAction(){
-    const response = await currentUserService.getCurrentUserStudent();
+export async function getCurrentUserAction(){
+    const response = await currentUserService.getCurrentUser();
     return response;
 }
 

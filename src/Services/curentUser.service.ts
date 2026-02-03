@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 const API_URL = env.API_URL;
 
 export const currentUserService = {
-    getCurrentUserStudent: async () => {
+    getCurrentUser: async () => {
         try {
             const url = new URL(`${API_URL}/user/current-user`);
             const cookieStore = await cookies();

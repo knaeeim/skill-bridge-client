@@ -1,5 +1,6 @@
 import { env } from "@/env";
 import { cookies } from "next/headers";
+import { sessionService } from "./session.service";
 
 export interface StudentFormData {
     name: string;
@@ -45,7 +46,9 @@ export const studentService = {
     },
     getStudentStats: async () => {
         try {
-            const url = new URL(`${API_URL}/student/student-profile/stats`);
+            const session = await sessionService.getSession();
+            const studentId = session.data?.user.id;
+            const url = new URL(`${API_URL}/student/student-profile/stats/${studentId}`);
             const response = await fetch(url.toString(), {
                 cache: 'no-store'
             });

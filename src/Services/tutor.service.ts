@@ -1,6 +1,5 @@
 import { env } from "@/env";
-import { TutorFormData } from "@/types";
-import { cx } from "class-variance-authority";
+import { AvailabilitySlot, TutorFormData } from "@/types";
 import { cookies } from "next/headers";
 
 export interface ServiceOptions {
@@ -17,6 +16,17 @@ export interface GetTutorsParams {
     limit?: number;
     isFeatured?: string;
     isApproved?: string;
+}
+
+export interface TutorUpdateData {
+    name?: string;
+    image?: string;
+    bio?: string;
+    experienceYears?: number;
+    hourlyRate?: number;
+    subjects?: string[];
+    availabilities?: AvailabilitySlot[],
+    category?: string[]
 }
 
 const API_URL = env.API_URL;
@@ -132,5 +142,45 @@ export const tutorServices = {
             }
             return { data: null, error: 'An unknown error occurred' }
         }
-    }
+    },
+    updateTutorProfile: async (tutorData: TutorUpdateData) => {
+        try {
+            const url = new URL(`${API_URL}/tutor/update-tutor`);
+            const cookieStore = await cookies();
+            const response = await fetch(url.toString(), {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Cookie: cookieStore.toString()
+                },
+                body: JSON.stringify(tutorData)
+            })
+            const data = await response.json();
+            return { data: data, error: null }
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return { data: null, error: error.message }
+            }
+            return { data: null, error: 'An unknown error occurred' }
+        }
+    },
+    getTutorBooking: async () => {
+        try {
+            const url = new URL(`${API_URL}/booking/user-bookings`);
+            const cookieStore = await cookies();
+            const response = await fetch(url.toString(), {
+                cache: 'no-store',
+                headers: {
+                    Cookie: cookieStore.toString()
+                }
+            })
+            const data = await response.json();
+            return { data: data, error: null }
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return { data: null, error: error.message }
+            }
+            return { data: null, error: 'An unknown error occurred' }
+        }
+    },
 }

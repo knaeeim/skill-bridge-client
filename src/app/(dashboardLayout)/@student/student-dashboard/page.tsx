@@ -10,7 +10,7 @@ const StudentDashboardOverview = async () => {
     // 1. Fetch Data in Parallel
     const [statsRes, profileRes] = await Promise.all([
         studentService.getStudentStats(),
-        currentUserService.getCurrentUserStudent(),
+        currentUserService.getCurrentUser(),
     ]);
 
     // 2. Safe Data Extraction

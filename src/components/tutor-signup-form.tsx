@@ -113,9 +113,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
     }, []);
 
     const subjectOptions = Object.values(Subjects).map((key) => ({
-            label: key.replace(/_/g, " "),
-            value: key,
-        }));
+        label: key.replace(/_/g, " "),
+        value: key,
+    }));
 
     const form = useForm({
         defaultValues: {
@@ -179,7 +179,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                 toast.success("Tutor account created successfully!", { id: toastId });
             } catch (error: unknown) {
                 if (error instanceof Error) {
-                    return toast.error(`Failed to create account: ${error.message}`, { id: toastId });
+                    return toast.error(`Failed to create account: ${error.message}`, {
+                        id: toastId,
+                    });
                 }
                 toast.error("Failed to create account: Unknown error", { id: toastId });
             }
@@ -457,14 +459,24 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                                                             );
                                                                         return (
                                                                             <CommandItem
-                                                                                key={option.value}
-                                                                                value={option.label}
+                                                                                key={
+                                                                                    option.value
+                                                                                }
+                                                                                value={
+                                                                                    option.label
+                                                                                }
                                                                                 onSelect={() => {
-                                                                                    if (isSelected) {
+                                                                                    if (
+                                                                                        isSelected
+                                                                                    ) {
                                                                                         // রিমুভ লজিক
                                                                                         field.handleChange(
                                                                                             selectedValues.filter(
-                                                                                                (s) => s !== option.value,
+                                                                                                (
+                                                                                                    s,
+                                                                                                ) =>
+                                                                                                    s !==
+                                                                                                    option.value,
                                                                                             ),
                                                                                         );
                                                                                     } else {
@@ -484,7 +496,11 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                                                                             ? "bg-primary text-primary-foreground"
                                                                                             : "opacity-50 [&_svg]:invisible",
                                                                                     )}>
-                                                                                    <Check className={cn("h-4 w-4")} />
+                                                                                    <Check
+                                                                                        className={cn(
+                                                                                            "h-4 w-4",
+                                                                                        )}
+                                                                                    />
                                                                                 </div>
                                                                                 {option.label}
                                                                             </CommandItem>
@@ -601,10 +617,11 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                                                                             }}
                                                                                             className={`
                                                                 cursor-pointer px-3 py-2 rounded-md text-xs font-semibold border transition-all
-                                                                ${isSelected
-                                                                                                    ? "bg-primary text-primary-foreground border-primary"
-                                                                                                    : "bg-background hover:bg-muted text-muted-foreground border-input"
-                                                                                                }
+                                                                ${
+                                                                    isSelected
+                                                                        ? "bg-primary text-primary-foreground border-primary"
+                                                                        : "bg-background hover:bg-muted text-muted-foreground border-input"
+                                                                }
                                                             `}>
                                                                                             {day.slice(
                                                                                                 0,
