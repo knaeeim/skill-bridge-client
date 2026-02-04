@@ -139,7 +139,7 @@ const TutorDashboardPage = async () => {
                         {/* User Info */}
                         <div className="flex items-start gap-4">
                             <Avatar className="h-16 w-16 border border-border">
-                                <AvatarImage src={user?.image || ""} />
+                                <AvatarImage className='object-cover object-top' src={user?.image || ""} />
                                 <AvatarFallback className="text-lg font-bold bg-muted text-muted-foreground">
                                     {initials}
                                 </AvatarFallback>

@@ -25,7 +25,6 @@ import {
 import BookingSection from "./BookingModal";
 import { sessionService } from "@/Services/session.service";
 
-// ১. আপনার JSON ডাটা অনুযায়ী ইন্টারফেস (Exact Match)
 interface TutorResponse {
     id: string;
     userId: string;

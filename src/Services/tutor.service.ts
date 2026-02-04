@@ -22,11 +22,7 @@ export interface TutorUpdateData {
     name?: string;
     image?: string;
     bio?: string;
-    experienceYears?: number;
     hourlyRate?: number;
-    subjects?: string[];
-    availabilities?: AvailabilitySlot[],
-    category?: string[]
 }
 
 const API_URL = env.API_URL;
@@ -145,7 +141,7 @@ export const tutorServices = {
     },
     updateTutorProfile: async (tutorData: TutorUpdateData) => {
         try {
-            const url = new URL(`${API_URL}/tutor/update-tutor`);
+            const url = new URL(`${API_URL}/tutor/update-tutor-profile`);
             const cookieStore = await cookies();
             const response = await fetch(url.toString(), {
                 method: "PUT",
@@ -156,6 +152,7 @@ export const tutorServices = {
                 body: JSON.stringify(tutorData)
             })
             const data = await response.json();
+            console.log(data);
             return { data: data, error: null }
         } catch (error: unknown) {
             if (error instanceof Error) {
