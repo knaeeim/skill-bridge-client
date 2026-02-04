@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { tutorServices } from "@/Services/tutor.service";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -64,6 +64,11 @@ const formatSubject = (subject: any) => {
 
 const TutorDetailsPage = async (props: Props) => {
     const session = await sessionService.getSession();
+
+    if(!session || !session.data){
+        redirect("/login");
+    }
+
     const params = await props.params;
     const { id } = params;
 

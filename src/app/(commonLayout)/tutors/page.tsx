@@ -1,7 +1,7 @@
 "use client";
 
 import { getAllTutors } from "@/actions/tutor.action";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Link from "next/link";
 import {
     Card,
@@ -18,19 +18,29 @@ import { Separator } from "@/components/ui/separator";
 import { Star, MapPin, Clock, ArrowRight, BookOpen } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tutor } from "@/types";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import PaginationControls from "@/components/paginationControls";
 
 // Define Interface based on your data structure
 
-const AllTutors = () => {
+const AllTutors = ({ searchParams }: { searchParams: Promise<{ page: string, limit: string }> }) => {
     const [tutors, setTutors] = useState<Tutor[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [pagination, setPagination] = useState({ limit: 10, page: 1, total : 0, totalPages : 1});
+
+    const { page, limit } = use(searchParams);
 
     useEffect(() => {
         const fetchTutors = async () => {
             try {
                 // Assuming getAllTutors returns { data: Tutor[] }
-                const {data, error} = await getAllTutors({ isApproved : "true" });
-                setTutors(data.data);
+                const { data: tutors, error } = await getAllTutors(
+                    { isApproved: "true", page, limit },
+                    { cache: "no-store" },
+                );
+                setPagination(tutors.data.pagination);
+                setTutors(tutors.data.data);
             } catch (error) {
                 console.error("Failed to fetch tutors", error);
             } finally {
@@ -40,7 +50,8 @@ const AllTutors = () => {
         fetchTutors();
     }, []);
 
-    console.log(tutors);
+    console.log(pagination);
+
     // Loading State (Skeleton)
     if (isLoading) {
         return (
@@ -96,6 +107,10 @@ const AllTutors = () => {
                     </p>
                 </div>
             )}
+
+            <div className="my-10">
+                <PaginationControls pagination={pagination}/>
+            </div>
         </div>
     );
 };
@@ -112,7 +127,11 @@ const TutorCard = ({ tutor }: { tutor: Tutor }) => {
                 <div className="flex justify-between items-start">
                     <div className="flex gap-4">
                         <Avatar className="h-14 w-14 border-2 border-primary/10">
-                            <AvatarImage className="object-cover object-top" src={tutor.image || ""} alt={tutor.name} />
+                            <AvatarImage
+                                className="object-cover object-top"
+                                src={tutor.image || ""}
+                                alt={tutor.name}
+                            />
                             <AvatarFallback className="font-bold text-lg">
                                 {tutor.name.charAt(0).toUpperCase()}
                             </AvatarFallback>

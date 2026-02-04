@@ -2,6 +2,15 @@ import { Route } from "@/types";
 
 export const adminRoutes: Route[] = [
     {
+        title : "Admin Home", 
+        items : [
+            {
+                title : "Overview",
+                url : "/admin-dashboard"
+            }
+        ]
+    },
+    {
         title: "User Management",
         items: [
             {

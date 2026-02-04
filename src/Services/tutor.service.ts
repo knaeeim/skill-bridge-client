@@ -13,8 +13,8 @@ export interface GetTutorsParams {
     experienceYears?: number;
     hourlyRate?: number
     setOrder?: string;
-    page?: number;
-    limit?: number;
+    page?: string;
+    limit?: string;
     isFeatured?: string;
     isApproved?: string;
 }

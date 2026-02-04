@@ -24,12 +24,13 @@ import { Tutor } from "@/types";
 import { Separator } from "@/components/ui/separator"; // Make sure to install this: npx shadcn@latest add separator
 
 export default async function Home() {
-    const { data: tutors } = await tutorServices.getAllTutors(
+    const { data : tutors } = await tutorServices.getAllTutors(
         { isFeatured: "true" },
         { cache: "no-store" },
     );
     // const session = await authClient.getSession(); // Uncomment if needed
-
+    console.log(tutors);
+    
     return (
         <div className="flex flex-col min-h-screen">
             {/* --- HERO SECTION --- */}
@@ -141,7 +142,7 @@ export default async function Home() {
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {tutors?.data.map((tutor: Tutor) => (
+                        {tutors?.data?.data.map((tutor: Tutor) => (
                             <Card
                                 key={tutor.id}
                                 className="overflow-hidden hover:border-primary transition-colors">
