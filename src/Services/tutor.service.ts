@@ -1,6 +1,7 @@
 import { env } from "@/env";
 import { AvailabilitySlot, TutorFormData } from "@/types";
 import { cookies } from "next/headers";
+import { sessionService } from "./session.service";
 
 export interface ServiceOptions {
     cache?: RequestCache;
@@ -150,6 +151,28 @@ export const tutorServices = {
                     Cookie: cookieStore.toString()
                 },
                 body: JSON.stringify(tutorData)
+            })
+            const data = await response.json();
+            console.log(data);
+            return { data: data, error: null }
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return { data: null, error: error.message }
+            }
+            return { data: null, error: 'An unknown error occurred' }
+        }
+    },
+    updateTutorAvailability: async (availabilities: AvailabilitySlot[]) => {
+        try {
+            const url = new URL(`${API_URL}/tutor/update-tutor-availability`);
+            const cookieStore = await cookies();
+            const response = await fetch(url.toString(), {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Cookie: cookieStore.toString()
+                },
+                body: JSON.stringify(availabilities)
             })
             const data = await response.json();
             console.log(data);

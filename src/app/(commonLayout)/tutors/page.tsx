@@ -112,7 +112,7 @@ const TutorCard = ({ tutor }: { tutor: Tutor }) => {
                 <div className="flex justify-between items-start">
                     <div className="flex gap-4">
                         <Avatar className="h-14 w-14 border-2 border-primary/10">
-                            <AvatarImage src={tutor.image || ""} alt={tutor.name} />
+                            <AvatarImage className="object-cover object-top" src={tutor.image || ""} alt={tutor.name} />
                             <AvatarFallback className="font-bold text-lg">
                                 {tutor.name.charAt(0).toUpperCase()}
                             </AvatarFallback>

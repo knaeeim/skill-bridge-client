@@ -134,6 +134,7 @@ const TutorDetailsPage = async (props: Props) => {
                                     <div className="relative">
                                         <Avatar className="h-32 w-32 border-4 border-background shadow-md bg-white">
                                             <AvatarImage
+                                                className="object-cover object-top"
                                                 src={user.image || ""}
                                                 alt={user.name}
                                             />

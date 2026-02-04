@@ -1,7 +1,7 @@
 "use server"
 
 import { GetTutorsParams, ServiceOptions, tutorServices, TutorUpdateData } from "@/Services/tutor.service";
-import { TutorFormData } from "@/types";
+import { AvailabilitySlot, TutorFormData } from "@/types";
 
 export async function createTutorProfile(TutorData: TutorFormData) {
     const response = await tutorServices.createTutorProfile(TutorData);
@@ -28,6 +28,18 @@ export async function getTutorDetails(tutorId: string) {
 export async function updateTutorProfileAction(tutorData: TutorUpdateData) {
     try {
         const response = await tutorServices.updateTutorProfile(tutorData);
+        return response;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return { data: null, error: error.message }
+        }
+        return { data: null, error: 'An unknown error occurred' }
+    }
+}
+
+export async function UpdateTutorAvailability(availabilities: AvailabilitySlot[]) {
+    try {
+        const response = await tutorServices.updateTutorAvailability(availabilities);
         return response;
     } catch (error: unknown) {
         if (error instanceof Error) {

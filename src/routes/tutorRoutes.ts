@@ -11,10 +11,10 @@ export const tutorRoutes : Route[] = [
         ]
     }, 
     {
-        title : "Manage availabilities", 
+        title : "Manage Availabilities", 
         items : [
             {
-                title : "My Availabilities",
+                title : "Edit Availabilities",
                 url : "/tutor-dashboard/availabilities"
             }
         ]
