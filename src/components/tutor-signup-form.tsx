@@ -101,6 +101,7 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
             try {
                 // সরাসরি ফাংশন কল করুন (API URL ফেচ করার দরকার নেই)
                 const data = await getCategories();
+                console.log(data);
                 setCategories(data.data);
             } catch (err) {
                 console.error("Failed to load categories");

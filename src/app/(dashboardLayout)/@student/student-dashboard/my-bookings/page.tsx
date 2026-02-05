@@ -1,5 +1,5 @@
-import React from "react";
-import { studentService } from "@/Services/student.service";
+"use client";
+import React, { useEffect, useState } from "react";
 import {
     Table,
     TableBody,
@@ -22,7 +22,9 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { sessionService } from "@/Services/session.service";
+import { toast } from "sonner";
+import { cancelStudentBookingAction, getStudentBookingAction } from "@/actions/student.action";
+import { Spinner } from "@/components/ui/spinner";
 
 // 1. Updated Type Definitions based on your JSON
 interface UserProfile {
@@ -50,12 +52,48 @@ interface Booking {
     student: UserProfile;
 }
 
-const StudentAllBookings = async () => {
+const StudentAllBookings = () => {
+    const [bookings, setBooking] = useState<Booking[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
     // 2. Fetch Data
-    const response = await studentService.getStudentBooking();
 
-    // Extract data safely based on your JSON structure: { data: { success: true, data: [...] } }
-    const bookings: Booking[] = response.data?.data || [];
+    const fetchingBookingData = async () => {
+        const response = await getStudentBookingAction();
+        console.log(response);
+        setBooking(response.data?.data);
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchingBookingData();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <Spinner className="size-5"></Spinner>
+            </div>
+        );
+    }
+
+    const handleBookingCancel = async (bookingId: string) => {
+        const toastId = toast.loading("Cancelling your booking...");
+        try {
+            const { data, error } = await cancelStudentBookingAction(bookingId);
+            if (error) {
+                return toast.error(`Failed to cancel booking: ${error}`, { id: toastId });
+            }
+            fetchingBookingData();
+            toast.success("Booking cancelled successfully!", { id: toastId });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return toast.error(`Failed to cancel booking: ${error.message}`, {
+                    id: toastId,
+                });
+            }
+            return toast.error("An unknown error occurred", { id: toastId });
+        }
+    };
 
     // 3. Status Badge Helper
     const getStatusBadge = (status: string) => {
@@ -215,7 +253,11 @@ const StudentAllBookings = async () => {
                                                                 Join Meeting
                                                             </DropdownMenuItem>
                                                         )}
-                                                        <DropdownMenuItem className="text-red-600 focus:text-red-600">
+                                                        <DropdownMenuItem
+                                                            onClick={() =>
+                                                                handleBookingCancel(booking.id)
+                                                            }
+                                                            className="text-red-600 focus:text-red-600">
                                                             Cancel Booking
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>

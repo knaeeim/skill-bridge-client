@@ -2,6 +2,7 @@
 
 import { currentUserService } from "@/Services/curentUser.service";
 import { BookingPayload, StudentFormData, studentService } from "@/Services/student.service";
+import { revalidatePath } from "next/cache";
 
 export async function createStudentProfileAction(studentData: StudentFormData) {
     const response = await studentService.createStudent(studentData);
@@ -21,6 +22,32 @@ export async function getCurrentUserAction(){
 export async function createStudentBookingAction(bookingData: BookingPayload) {
     try {
         const response = await studentService.createBooking(bookingData);
+        return response;
+    } catch (error : unknown) {
+        if(error instanceof Error) {
+            return { data: null, error: error.message }
+        }
+        return { data: null, error: 'An unknown error occurred' }
+    }
+}
+
+export async function cancelStudentBookingAction(bookingId : string) {
+    try {
+        const response = await studentService.cancelBooking(bookingId);
+        revalidatePath("/student-dashboard/my-bookings");
+        return response;
+    } catch (error : unknown) {
+        if(error instanceof Error) {
+            return { data: null, error: error.message }
+        }
+        return { data: null, error: 'An unknown error occurred' }
+    }
+}
+
+export async function getStudentBookingAction() {
+    try {
+        const response = await studentService.getStudentBooking();
+        revalidatePath("/student-dashboard/my-bookings");
         return response;
     } catch (error : unknown) {
         if(error instanceof Error) {

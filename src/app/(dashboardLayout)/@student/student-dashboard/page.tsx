@@ -19,6 +19,7 @@ const StudentDashboardOverview = async () => {
         bookingsCount: 0,
         reviewsCount: 0,
         totalSpentAgg: null,
+        totalCancelled: 0
     };
     const user = profileRes?.data?.data || null;
 
@@ -64,7 +65,7 @@ const StudentDashboardOverview = async () => {
             </div>
 
             {/* --- STATS GRID --- */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {/* Card 1: Total Bookings */}
                 <Card className="hover:border-primary/50 transition-colors">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -74,6 +75,18 @@ const StudentDashboardOverview = async () => {
                     <CardContent>
                         <div className="text-2xl font-bold">{stats.bookingsCount}</div>
                         <p className="text-xs text-muted-foreground">Sessions booked so far</p>
+                    </CardContent>
+                </Card>
+
+                {/* Card 1: Total Cancelled Booking */}
+                <Card className="hover:border-primary/50 transition-colors">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Total Cancelled Bookings</CardTitle>
+                        <BookOpen className="h-4 w-4 text-blue-500" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{stats.totalCancelled}</div>
+                        <p className="text-xs text-muted-foreground">Sessions cancelled so far</p>
                     </CardContent>
                 </Card>
 

@@ -14,7 +14,8 @@ export async function proxy(request: NextRequest) {
     const isAuthenticated = !!user;
     const userRole = user?.role;
 
-    const isAuthRoute = pathname === '/login' || pathname === '/register';
+    const isAuthRoute = pathname === '/login' || pathname === '/register/tutor-registration' || pathname === '/register/student-registration';
+    
     const isDashboardRoute = pathname.startsWith('/admin-dashboard') || pathname.startsWith('/tutor-dashboard') || pathname.startsWith('/student-dashboard');
 
     if(isAuthenticated && isAuthRoute){
@@ -49,5 +50,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/admin-dashboard/:path*", "/tutor-dashboard/:path*", "/student-dashboard/:path*", "/login", "/register"]
+    matcher: ["/admin-dashboard/:path*", "/tutor-dashboard/:path*", "/student-dashboard/:path*", "/login", "/register/tutor-registration", "/register/student-registration"]
 }
