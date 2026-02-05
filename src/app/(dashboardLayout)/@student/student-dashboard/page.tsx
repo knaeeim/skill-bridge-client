@@ -6,6 +6,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, CreditCard, Star, Wallet, CalendarDays, Mail, Shield } from "lucide-react";
 
+interface StudentDashboardOverviewProps {
+    bookingsCount: number;
+    reviewsCount: number;
+    totalSpentAgg: {
+        _sum : {
+            price : number;
+        }
+    };
+    totalCancelled: number;
+    inProgressBooking: number;
+}
+
 const StudentDashboardOverview = async () => {
     // 1. Fetch Data in Parallel
     const [statsRes, profileRes] = await Promise.all([
@@ -15,30 +27,26 @@ const StudentDashboardOverview = async () => {
 
     // 2. Safe Data Extraction
     // Structure is: { data: { success: true, data: { ... } } }
-    const stats = statsRes?.data?.data || {
-        bookingsCount: 0,
-        reviewsCount: 0,
-        totalSpentAgg: null,
-        totalCancelled: 0
-    };
+    const stats : StudentDashboardOverviewProps = statsRes?.data?.data;
     const user = profileRes?.data?.data || null;
 
     if (!user) {
         return <div className="p-4 text-red-500">Failed to load user profile.</div>;
     }
 
-    // 3. Handle Total Spent Logic (Prisma Aggregation usually returns _sum)
-    // Assuming the object structure is { _sum: { amount: 100 } } or similar
-    // Adjust 'amount' to whatever field name is in your Booking model
     const totalSpent =
-        stats.totalSpentAgg?._sum?.amount || stats.totalSpentAgg?._sum?.price || 0;
+        stats.totalSpentAgg?._sum?.price || stats.totalSpentAgg?._sum?.price || 0;
 
     return (
         <div className="space-y-8">
             {/* --- WELCOME HEADER --- */}
             <div className="flex flex-col md:flex-row gap-6 items-start md:items-center bg-card p-6 rounded-xl border shadow-sm">
                 <Avatar className="h-20 w-20 border-4 border-muted">
-                    <AvatarImage className="object-cover object-top" src={user.image || ""} alt={user.name} />
+                    <AvatarImage
+                        className="object-cover object-top"
+                        src={user.image || ""}
+                        alt={user.name}
+                    />
                     <AvatarFallback className="text-2xl font-bold bg-primary/10 text-primary">
                         {user.name.charAt(0).toUpperCase()}
                     </AvatarFallback>
@@ -65,7 +73,7 @@ const StudentDashboardOverview = async () => {
             </div>
 
             {/* --- STATS GRID --- */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                 {/* Card 1: Total Bookings */}
                 <Card className="hover:border-primary/50 transition-colors">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -77,20 +85,37 @@ const StudentDashboardOverview = async () => {
                         <p className="text-xs text-muted-foreground">Sessions booked so far</p>
                     </CardContent>
                 </Card>
-
-                {/* Card 1: Total Cancelled Booking */}
+                {/* Card 1: Inprogress Bookings */}
                 <Card className="hover:border-primary/50 transition-colors">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Cancelled Bookings</CardTitle>
+                        <CardTitle className="text-sm font-medium">
+                            Inprogress Bookings
+                        </CardTitle>
+                        <BookOpen className="h-4 w-4 text-blue-500" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{stats.inProgressBooking}</div>
+                        <p className="text-xs text-muted-foreground">Sessions booked so far</p>
+                    </CardContent>
+                </Card>
+
+                {/* Card 3: Total Cancelled Booking */}
+                <Card className="hover:border-primary/50 transition-colors">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">
+                            Total Cancelled Bookings
+                        </CardTitle>
                         <BookOpen className="h-4 w-4 text-blue-500" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{stats.totalCancelled}</div>
-                        <p className="text-xs text-muted-foreground">Sessions cancelled so far</p>
+                        <p className="text-xs text-muted-foreground">
+                            Sessions cancelled so far
+                        </p>
                     </CardContent>
                 </Card>
 
-                {/* Card 2: Total Spent */}
+                {/* Card 4: Total Spent */}
                 <Card className="hover:border-primary/50 transition-colors">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
@@ -104,7 +129,7 @@ const StudentDashboardOverview = async () => {
                     </CardContent>
                 </Card>
 
-                {/* Card 3: Reviews */}
+                {/* Card 5: Reviews */}
                 <Card className="hover:border-primary/50 transition-colors">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Reviews Given</CardTitle>
@@ -125,7 +150,7 @@ const StudentDashboardOverview = async () => {
                         <CardTitle>Overview</CardTitle>
                     </CardHeader>
                     <CardContent className="pl-2">
-                        <div className="h-[200px] flex items-center justify-center text-muted-foreground bg-muted/20 rounded-md">
+                        <div className="h-50 flex items-center justify-center text-muted-foreground bg-muted/20 rounded-md">
                             Chart or Graph Placeholder
                         </div>
                     </CardContent>

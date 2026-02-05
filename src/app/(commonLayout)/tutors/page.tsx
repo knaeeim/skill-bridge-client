@@ -50,8 +50,6 @@ const AllTutors = ({ searchParams }: { searchParams: Promise<{ page: string, lim
         fetchTutors();
     }, []);
 
-    console.log(pagination);
-
     // Loading State (Skeleton)
     if (isLoading) {
         return (
@@ -121,6 +119,8 @@ const TutorCard = ({ tutor }: { tutor: Tutor }) => {
     const { tutorProfile } = tutor;
     const subjects = tutorProfile?.subjects || [];
 
+    console.log(tutorProfile);
+
     return (
         <Card className="flex flex-col h-full hover:shadow-lg transition-shadow duration-300 border-muted">
             <CardHeader className="pb-3">
@@ -143,7 +143,7 @@ const TutorCard = ({ tutor }: { tutor: Tutor }) => {
                                 <Star className="w-4 h-4 fill-primary" />
                                 {tutorProfile?.rating || "No Rating"}
                                 <span className="text-muted-foreground font-bold text-sm ml-1">
-                                    ({tutorProfile?.rating} reviews)
+                                    ({tutorProfile?.totalReviews} reviews)
                                 </span>
                             </CardDescription>
                         </div>

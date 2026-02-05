@@ -51,19 +51,6 @@ export default async function Home() {
                         calculus, find the perfect mentor to help you succeed.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-lg mx-auto mb-10">
-                        <div className="relative w-full">
-                            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                placeholder="What do you want to learn? (e.g. React, Physics)"
-                                className="pl-10 h-12"
-                            />
-                        </div>
-                        <Button size="lg" className="h-12 w-full sm:w-auto">
-                            Find a Tutor
-                        </Button>
-                    </div>
-
                     <div className="flex flex-wrap justify-center gap-8 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-green-500" /> 5,000+ Verified
@@ -150,7 +137,7 @@ export default async function Home() {
                                     <div className="h-24 bg-linear-to-r from-blue-500 to-cyan-500 relative"></div>
                                     <div className="px-6 -mt-10">
                                         <Avatar className="h-20 w-20 border-4 border-background">
-                                            <AvatarImage src={tutor.image || ""} />
+                                            <AvatarImage className="object-cover object-top" src={tutor.image || ""} />
                                             <AvatarFallback>{tutor.name[0]}</AvatarFallback>
                                         </Avatar>
                                     </div>

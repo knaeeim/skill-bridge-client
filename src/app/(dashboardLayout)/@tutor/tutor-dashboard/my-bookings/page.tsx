@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { tutorServices } from "@/Services/tutor.service";
 import {
     Table,
@@ -22,6 +23,7 @@ import {
     X,
     User,
     Banknote,
+    DeleteIcon,
 } from "lucide-react";
 import {
     DropdownMenu,
@@ -31,6 +33,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
+import { getTutorBookingAction, markAsCompleted } from "@/actions/tutor.action";
+import { Spinner } from "@/components/ui/spinner";
+import { cancelStudentBookingAction } from "@/actions/student.action";
 
 // 1. Type Definitions matching your JSON
 interface UserProfile {
@@ -55,13 +61,69 @@ interface Booking {
     student: UserProfile; // We need Student info for Tutor View
 }
 
-const TutorsBookingPage = async () => {
+const TutorsBookingPage = () => {
+    const [bookings, setBooking] = useState<Booking[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
     // 2. Fetch Data
-    const response = await tutorServices.getTutorBooking();
 
-    // FIX: Access data.data just like your Student Component
-    // response.data (Axios body) -> .data (The array inside your JSON)
-    const bookings: Booking[] = response.data?.data || [];
+    const fetchingBookingData = async () => {
+        const response = await getTutorBookingAction();
+        console.log(response);
+        setBooking(response.data?.data);
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchingBookingData();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <Spinner className="size-5"></Spinner>
+            </div>
+        );
+    }
+
+    const handleBookingCancel = async (bookingId: string) => {
+        const toastId = toast.loading("Cancelling your booking...");
+        try {
+            const { data, error } = await cancelStudentBookingAction(bookingId);
+            if (error) {
+                return toast.error(`Failed to cancel booking: ${error}`, { id: toastId });
+            }
+            fetchingBookingData();
+            toast.success("Booking cancelled successfully!", { id: toastId });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return toast.error(`Failed to cancel booking: ${error.message}`, {
+                    id: toastId,
+                });
+            }
+            return toast.error("An unknown error occurred", { id: toastId });
+        }
+    };
+
+    const handleMarkAsCompleted = async (bookingId: string) => {
+        const toastId = toast.loading("Marking booking as completed...");
+        try {
+            const { data, error } = await markAsCompleted(bookingId);
+            if (error) {
+                return toast.error(`Failed to mark booking as completed: ${error}`, {
+                    id: toastId,
+                });
+            }
+            fetchingBookingData();
+            toast.success("Booking marked as completed successfully!", { id: toastId });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                return toast.error(`Failed to mark booking as completed: ${error.message}`, {
+                    id: toastId,
+                });
+            }
+            return toast.error("An unknown error occurred", { id: toastId });
+        }
+    };
 
     // 3. Status Badge Helper
     const getStatusBadge = (status: string) => {
@@ -205,33 +267,79 @@ const TutorsBookingPage = async () => {
 
                                             {/* Actions Menu */}
                                             <TableCell className="text-right">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button
-                                                            variant="ghost"
-                                                            className="h-8 w-8 p-0">
-                                                            <span className="sr-only">
-                                                                Open menu
-                                                            </span>
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuLabel>
-                                                            Actions
-                                                        </DropdownMenuLabel>
-                                                        <DropdownMenuItem>
-                                                            <User className="mr-2 h-4 w-4" />{" "}
-                                                            View Profile
-                                                        </DropdownMenuItem>
-
+                                                {booking.status === "COMPLETED" || booking.status === "CANCELLED" ? (
+                                                    <>
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    className="h-8 w-8 p-0">
+                                                                    <span className="sr-only">
+                                                                        Open menu
+                                                                    </span>
+                                                                    <MoreHorizontal className="h-4 w-4" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+                                                                <DropdownMenuLabel>
+                                                                    Actions
+                                                                </DropdownMenuLabel>
+                                                                <DropdownMenuItem>
+                                                                    <User className="mr-2 h-4 w-4" />{" "}
+                                                                    No actions available
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </>
+                                                ) : (
+                                                    <>
                                                         {booking.status === "CONFIRMED" && (
-                                                            <DropdownMenuItem className="text-red-600 focus:text-red-600">
-                                                                Cancel Class
-                                                            </DropdownMenuItem>
+                                                            <>
+                                                                <DropdownMenu>
+                                                                    <DropdownMenuTrigger
+                                                                        asChild>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            className="h-8 w-8 p-0">
+                                                                            <span className="sr-only">
+                                                                                Open menu
+                                                                            </span>
+                                                                            <MoreHorizontal className="h-4 w-4" />
+                                                                        </Button>
+                                                                    </DropdownMenuTrigger>
+                                                                    <DropdownMenuContent align="end">
+                                                                        <DropdownMenuLabel>
+                                                                            Actions
+                                                                        </DropdownMenuLabel>
+                                                                        <DropdownMenuItem
+                                                                            onClick={() =>
+                                                                                handleMarkAsCompleted(
+                                                                                    booking.id,
+                                                                                )
+                                                                            }>
+                                                                            <User className="mr-2 h-4 w-4" />{" "}
+                                                                            Mark as Completed
+                                                                        </DropdownMenuItem>
+
+                                                                        {booking.status ===
+                                                                            "CONFIRMED" && (
+                                                                            <DropdownMenuItem
+                                                                                onClick={() =>
+                                                                                    handleBookingCancel(
+                                                                                        booking.id,
+                                                                                    )
+                                                                                }
+                                                                                className="text-red-600 focus:text-red-600">
+                                                                                <X className="mr-2 h-4 w-4" />{" "}
+                                                                                Cancel Class
+                                                                            </DropdownMenuItem>
+                                                                        )}
+                                                                    </DropdownMenuContent>
+                                                                </DropdownMenu>
+                                                            </>
                                                         )}
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                                    </>
+                                                )}
                                             </TableCell>
                                         </TableRow>
                                     ))}

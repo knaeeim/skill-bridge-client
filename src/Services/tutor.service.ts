@@ -203,4 +203,26 @@ export const tutorServices = {
             return { data: null, error: 'An unknown error occurred' }
         }
     },
+    markAsCompleted : async (bookingId : string) => {
+        try {
+            const url = new URL(`${API_URL}/booking/mark-booking-as-completed/${bookingId}`);
+            const cookieStore = await cookies();
+            const response = await fetch(url.toString(), {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Cookie: cookieStore.toString()
+                },
+                cache : 'no-store'
+            })
+            const data = await response.json();
+            console.log(data);
+            return {data : data, error : null}
+        } catch (error : unknown) {
+            if(error instanceof Error) {
+                return {data : null, error : error.message}
+            }
+            return {data : null, error : 'An unknown error occurred'}
+        }
+    }
 }

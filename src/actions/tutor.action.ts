@@ -2,6 +2,7 @@
 
 import { GetTutorsParams, ServiceOptions, tutorServices, TutorUpdateData } from "@/Services/tutor.service";
 import { AvailabilitySlot, TutorFormData } from "@/types";
+import { revalidatePath } from "next/cache";
 
 export async function createTutorProfile(TutorData: TutorFormData) {
     const response = await tutorServices.createTutorProfile(TutorData);
@@ -43,6 +44,32 @@ export async function UpdateTutorAvailability(availabilities: AvailabilitySlot[]
         return response;
     } catch (error: unknown) {
         if (error instanceof Error) {
+            return { data: null, error: error.message }
+        }
+        return { data: null, error: 'An unknown error occurred' }
+    }
+}
+
+export async function getTutorBookingAction() {
+    try {
+        const response = await tutorServices.getTutorBooking();
+        revalidatePath("/tutor-dashboard/my-bookings");
+        return response;
+    } catch (error : unknown) {
+        if(error instanceof Error) {
+            return { data: null, error: error.message }
+        }
+        return { data: null, error: 'An unknown error occurred' }
+    }
+}
+
+export async function markAsCompleted(bookingId: string) {
+    try {
+        const response = await tutorServices.markAsCompleted(bookingId);
+        revalidatePath("/tutor-dashboard/my-bookings");
+        return response;
+    } catch (error : unknown) {
+        if(error instanceof Error) {
             return { data: null, error: error.message }
         }
         return { data: null, error: 'An unknown error occurred' }

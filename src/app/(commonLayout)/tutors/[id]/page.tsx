@@ -25,6 +25,22 @@ import {
 import BookingSection from "./BookingModal";
 import { sessionService } from "@/Services/session.service";
 
+interface Review {
+    id: string;
+    bookingId: string;
+    studentId: string;
+    tutorId: string;
+    rating: number;
+    comment: string;
+    createdAt: string;
+    // Note: Ideally, your backend should include the student details here.
+    // I've added this optional field so the UI looks good if you populate it later.
+    student?: {
+        name: string;
+        image: string | null;
+    };
+}
+
 interface TutorResponse {
     id: string;
     userId: string;
@@ -35,7 +51,8 @@ interface TutorResponse {
     totalReviews: number;
     isApproved: boolean;
     isFeatured: boolean;
-    subjects: string[]; // ["MATH", "ENGLISH", "SCIENCE"]
+    subjects: string[];
+    reviews: Review[]; // ["MATH", "ENGLISH", "SCIENCE"]
     createdAt: string;
     updatedAt: string;
     // user অবজেক্টটি data এর ভেতরেই আছে
@@ -103,8 +120,11 @@ const TutorDetailsPage = async (props: Props) => {
         // নিচের গুলো না থাকলে ডিফল্ট ভ্যালু বা empty array
         category = [],
         availabilities = [],
+        reviews = [],
         isApproved,
     } = tutorData;
+
+    console.log(reviews);
 
     // ৫. User অবজেক্ট চেক (Safety Check)
     if (!user) {
@@ -285,11 +305,87 @@ const TutorDetailsPage = async (props: Props) => {
                             <TabsContent value="reviews" className="mt-6">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Reviews ({totalReviews})</CardTitle>
+                                        <CardTitle className="flex items-center gap-2">
+                                            <MessageSquare className="h-5 w-5 text-primary" />
+                                            Student Reviews ({totalReviews})
+                                        </CardTitle>
                                     </CardHeader>
-                                    <CardContent className="text-center py-10 text-muted-foreground">
-                                        <MessageSquare className="h-10 w-10 mx-auto mb-2 opacity-20" />
-                                        <p>No reviews yet.</p>
+                                    <CardContent className="space-y-6">
+                                        {reviews && reviews.length > 0 ? (
+                                            <div className="grid grid-cols-1 gap-6">
+                                                {reviews.map((review) => (
+                                                    <div 
+                                                        key={review.id} 
+                                                        className="flex flex-col sm:flex-row gap-4 p-6 border rounded-xl bg-card hover:shadow-sm transition-shadow"
+                                                    >
+                                                        {/* Avatar Section */}
+                                                        <div className="flex-shrink-0">
+                                                            <Avatar className="h-12 w-12 border">
+                                                                <AvatarImage 
+                                                                    className="object-cover object-top"
+                                                                    src={review.student?.image || ""} 
+                                                                    alt="Student" 
+                                                                />
+                                                                <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                                                                    {review.student?.name?.[0] || "S"}
+                                                                </AvatarFallback>
+                                                            </Avatar>
+                                                        </div>
+
+                                                        {/* Content Section */}
+                                                        <div className="flex-1 space-y-2">
+                                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                                                <div>
+                                                                    <h4 className="font-semibold text-foreground">
+                                                                        {review.student?.name || "Student"}
+                                                                    </h4>
+                                                                    <p className="text-xs text-muted-foreground">
+                                                                        {new Date(review.createdAt).toLocaleDateString("en-US", {
+                                                                            year: 'numeric',
+                                                                            month: 'long',
+                                                                            day: 'numeric'
+                                                                        })}
+                                                                    </p>
+                                                                </div>
+                                                                
+                                                                {/* Star Rating */}
+                                                                <div className="flex items-center bg-yellow-500/10 px-2 py-1 rounded-full">
+                                                                    {Array.from({ length: 5 }).map((_, i) => (
+                                                                        <Star
+                                                                            key={i}
+                                                                            className={`h-3.5 w-3.5 ${
+                                                                                i < review.rating
+                                                                                    ? "fill-yellow-500 text-yellow-500"
+                                                                                    : "text-muted-foreground/30"
+                                                                            }`}
+                                                                        />
+                                                                    ))}
+                                                                    <span className="ml-2 text-sm font-medium text-yellow-700 dark:text-yellow-500">
+                                                                        {review.rating}.0
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
+                                                            <Separator className="my-2 opacity-50" />
+
+                                                            <p className="text-sm text-muted-foreground leading-relaxed italic">
+                                                                "{review.comment}"
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="text-center py-16 flex flex-col items-center justify-center text-muted-foreground">
+                                                <div className="bg-muted p-4 rounded-full mb-4">
+                                                    <MessageSquare className="h-8 w-8 opacity-50" />
+                                                </div>
+                                                <h3 className="text-lg font-medium text-foreground">No reviews yet</h3>
+                                                <p className="max-w-xs mx-auto text-sm mt-1">
+                                                    This tutor hasn't received any feedback from students yet.
+                                                </p>
+                                            </div>
+                                        )}
                                     </CardContent>
                                 </Card>
                             </TabsContent>

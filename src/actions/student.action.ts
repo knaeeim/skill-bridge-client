@@ -1,6 +1,7 @@
 'use server'
 
 import { currentUserService } from "@/Services/curentUser.service";
+import { reviewData, reviewService } from "@/Services/review.service";
 import { BookingPayload, StudentFormData, studentService } from "@/Services/student.service";
 import { revalidatePath } from "next/cache";
 
@@ -48,6 +49,20 @@ export async function getStudentBookingAction() {
     try {
         const response = await studentService.getStudentBooking();
         revalidatePath("/student-dashboard/my-bookings");
+        return response;
+    } catch (error : unknown) {
+        if(error instanceof Error) {
+            return { data: null, error: error.message }
+        }
+        return { data: null, error: 'An unknown error occurred' }
+    }
+}
+
+export async function giveAReview(reviewData : reviewData) {
+    try {
+        const response = await reviewService.createReview(reviewData);
+        revalidatePath("/student-dashboard/my-bookings");
+        console.log(response);
         return response;
     } catch (error : unknown) {
         if(error instanceof Error) {

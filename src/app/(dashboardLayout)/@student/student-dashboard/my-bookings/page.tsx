@@ -3,18 +3,18 @@ import React, { useEffect, useState } from "react";
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { CalendarDays, Clock, BookOpen, MoreHorizontal, Video } from "lucide-react";
+// Added 'Star' icon for reviews
+import { CalendarDays, Clock, BookOpen, MoreHorizontal, Video, Star } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -25,8 +25,9 @@ import {
 import { toast } from "sonner";
 import { cancelStudentBookingAction, getStudentBookingAction } from "@/actions/student.action";
 import { Spinner } from "@/components/ui/spinner";
+import ReviewModal from "./ReviewModal";
 
-// 1. Updated Type Definitions based on your JSON
+// ... (Interfaces remain the same)
 interface UserProfile {
     id: string;
     name: string;
@@ -41,26 +42,24 @@ interface Booking {
     studentId: string;
     tutorId: string;
     subject: string;
-    date: string; // "2026-02-04T00:00:00.000Z"
-    startTime: string; // "5:30 PM"
-    endTime: string; // "6:30 PM"
+    date: string;
+    startTime: string;
+    endTime: string;
     price: number;
-    status: string; // "CONFIRMED"
+    status: string;
     createdAt: string;
     updatedAt: string;
-    tutor: UserProfile; // Nested Tutor Object
+    tutor: UserProfile;
     student: UserProfile;
 }
 
 const StudentAllBookings = () => {
     const [bookings, setBooking] = useState<Booking[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    // 2. Fetch Data
 
     const fetchingBookingData = async () => {
         const response = await getStudentBookingAction();
-        console.log(response);
-        setBooking(response.data?.data);
+        setBooking(response.data?.data || []);
         setLoading(false);
     };
 
@@ -83,6 +82,7 @@ const StudentAllBookings = () => {
             if (error) {
                 return toast.error(`Failed to cancel booking: ${error}`, { id: toastId });
             }
+            // Optimistic update or refetch
             fetchingBookingData();
             toast.success("Booking cancelled successfully!", { id: toastId });
         } catch (error: unknown) {
@@ -95,7 +95,6 @@ const StudentAllBookings = () => {
         }
     };
 
-    // 3. Status Badge Helper
     const getStatusBadge = (status: string) => {
         const normalizedStatus = status.toUpperCase();
         switch (normalizedStatus) {
@@ -158,15 +157,16 @@ const StudentAllBookings = () => {
                                         <TableRow
                                             key={booking.id}
                                             className="hover:bg-muted/5">
-                                            {/* Tutor Column (Avatar + Name) */}
+                                            {/* Tutor Column */}
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
                                                     <Avatar className="h-10 w-10 border">
                                                         <AvatarImage
+                                                            className="object-cover object-top"
                                                             src={booking.tutor.image || ""}
                                                             alt={booking.tutor.name}
                                                         />
-                                                        <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                                                        <AvatarFallback className="bg-primary/15 text-primary font-bold">
                                                             {booking.tutor.name[0]}
                                                         </AvatarFallback>
                                                     </Avatar>
@@ -227,7 +227,7 @@ const StudentAllBookings = () => {
                                                 {getStatusBadge(booking.status)}
                                             </TableCell>
 
-                                            {/* Actions Menu */}
+                                            {/* --- ACTIONS MENU --- */}
                                             <TableCell className="text-right">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
@@ -244,22 +244,42 @@ const StudentAllBookings = () => {
                                                         <DropdownMenuLabel>
                                                             Actions
                                                         </DropdownMenuLabel>
-                                                        <DropdownMenuItem>
-                                                            View Details
-                                                        </DropdownMenuItem>
+                                                        {booking.status === "CANCELLED" && (
+                                                            <>
+                                                                <DropdownMenuItem>
+                                                                    No Action is Available
+                                                                </DropdownMenuItem>
+                                                            </>
+                                                        )}
+
+                                                        {/* JOIN MEETING: Only if Confirmed */}
                                                         {booking.status === "CONFIRMED" && (
-                                                            <DropdownMenuItem className="text-blue-600">
+                                                            <DropdownMenuItem className="text-blue-600 focus:text-blue-600">
                                                                 <Video className="mr-2 h-4 w-4" />{" "}
                                                                 Join Meeting
                                                             </DropdownMenuItem>
                                                         )}
-                                                        <DropdownMenuItem
-                                                            onClick={() =>
-                                                                handleBookingCancel(booking.id)
-                                                            }
-                                                            className="text-red-600 focus:text-red-600">
-                                                            Cancel Booking
-                                                        </DropdownMenuItem>
+
+                                                        {/* LEAVE REVIEW: Only if Completed */}
+                                                        {booking.status === "COMPLETED" && (
+                                                            <ReviewModal
+                                                                booking={
+                                                                    booking
+                                                                }></ReviewModal>
+                                                        )}
+                                                        {/* CANCEL: Only if NOT Completed AND NOT Cancelled */}
+                                                        {booking.status !== "COMPLETED" &&
+                                                            booking.status !== "CANCELLED" && (
+                                                                <DropdownMenuItem
+                                                                    onClick={() =>
+                                                                        handleBookingCancel(
+                                                                            booking.id,
+                                                                        )
+                                                                    }
+                                                                    className="text-red-600 focus:text-red-600">
+                                                                    Cancel Booking
+                                                                </DropdownMenuItem>
+                                                            )}
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </TableCell>
