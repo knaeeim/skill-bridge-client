@@ -30,10 +30,9 @@ export const adminService = {
             return data;
         } catch (error: unknown) {
             if (error instanceof Error) {
-                console.error("Error fetching stats:", error.message);
-            } else {
-                console.error("An unknown error occurred while fetching stats.");
+                return { data: null, error: error.message }
             }
+            return { data: null, error: 'An unknown error occurred' }
         }
     },
 
@@ -56,10 +55,9 @@ export const adminService = {
             return data;
         } catch (error: unknown) {
             if (error instanceof Error) {
-                console.error("Error fetching all bookings:", error.message);
-            } else {
-                console.error("An unknown error occurred while fetching all bookings.");
+                return { data: null, error: error.message }
             }
+            return { data: null, error: 'An unknown error occurred' }
         }
     },
 
@@ -90,10 +88,9 @@ export const adminService = {
             return data;
         } catch (error: unknown) {
             if (error instanceof Error) {
-                console.error("Error fetching all users:", error.message);
-            } else {
-                console.error("An unknown error occurred while fetching all users.");
+                return { data: null, error: error.message }
             }
+            return { data: null, error: 'An unknown error occurred' }
         }
     },
     updateUserStatus: async (userId: string, newStatus: Status) => {
@@ -117,10 +114,9 @@ export const adminService = {
             return data;
         } catch (error: unknown) {
             if (error instanceof Error) {
-                console.error("Error updating user status:", error.message);
-            } else {
-                console.error("An unknown error occurred while updating user status.");
+                return { data: null, error: error.message }
             }
+            return { data: null, error: 'An unknown error occurred' }
         }
     }, 
 
@@ -144,12 +140,34 @@ export const adminService = {
             revalidatePath("/admin-dashboard/all-categories");
             return data;
         } catch (error : unknown) {
-            if(error instanceof Error){
-                console.error("Error creating category:", error.message);
-            } else {
-                console.error("An unknown error occurred while creating category.");
+            if (error instanceof Error) {
+                return { data: null, error: error.message }
             }
+            return { data: null, error: 'An unknown error occurred' }
         }
     }, 
-    
+    getAllCategories : async () => {
+        try {
+            const url = new URL(`${API_URL}/admin/all-categories`)
+            const cookiesStore = await cookies()
+            const response = await fetch(url.toString(), {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Cookie: cookiesStore.toString()
+                }
+            })
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch all categories: ${response.status} ${response.statusText}`);
+            }
+            const data = await response.json();
+            return data;
+        } catch (error : unknown) {
+            if (error instanceof Error) {
+                return { data: null, error: error.message }
+            }
+            return { data: null, error: 'An unknown error occurred' }
+        }
+    }
 }

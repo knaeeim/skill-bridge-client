@@ -15,3 +15,15 @@ export const updateUserStatusAction = async (userId: string, newStatus: Status) 
         }
     }
 }
+
+export async function createCategoryAction(name: string, description?: string) {
+    try {
+        const response = await adminService.createCategory(name, description);
+        return response;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return { data: null, error: error.message }
+        }
+        return { data: null, error: 'An unknown error occurred' }
+    }
+}
