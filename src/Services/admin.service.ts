@@ -122,5 +122,34 @@ export const adminService = {
                 console.error("An unknown error occurred while updating user status.");
             }
         }
-    }
+    }, 
+
+    createCategory : async (name : string, description? : string) => {
+        try {
+            const url = new URL(`${API_URL}/admin/create-category`)
+            const cookiesStore = await cookies()
+            const response = await fetch(url.toString(), {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Cookie: cookiesStore.toString()
+                },
+                body: JSON.stringify({ name, description })
+            })
+
+            if (!response.ok) {
+                throw new Error(`Failed to create category: ${response.status} ${response.statusText}`);
+            }
+            const data = await response.json();
+            revalidatePath("/admin-dashboard/all-categories");
+            return data;
+        } catch (error : unknown) {
+            if(error instanceof Error){
+                console.error("Error creating category:", error.message);
+            } else {
+                console.error("An unknown error occurred while creating category.");
+            }
+        }
+    }, 
+    
 }

@@ -33,7 +33,7 @@ export const adminRoutes: Route[] = [
         items: [
             {
                 title: "All Categories",
-                url: "/admin-dashboard/categories"
+                url: "/admin-dashboard/all-categories"
             }
         ]
     }
