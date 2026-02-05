@@ -30,7 +30,8 @@ interface Stats {
             price: number;
         };
     };
-    totalReview: number;
+    totalReviews: number;
+    averageRatings : number;
     totalCancelled: number;
 }
 
@@ -63,6 +64,8 @@ const TutorDashboardPage = async () => {
     const user = userRes?.data?.data as UserData;
     const profile = user?.tutorProfile;
     const stats = statsRes?.data?.data as Stats;
+
+    console.log(stats);
 
     const initials =
         user?.name
@@ -138,8 +141,8 @@ const TutorDashboardPage = async () => {
                 />
                 <StatCard
                     title="Rating"
-                    value={profile?.rating || 0.0}
-                    subText={`Based on ${stats?.totalReview} reviews`}
+                    value={stats.averageRatings || 0.0}
+                    subText={`Based on ${stats?.totalReviews} reviews`}
                     icon={<Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />}
                 />
             </div>
