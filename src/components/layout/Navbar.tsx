@@ -1,9 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react"; // Import useState & useEffect
 import { Menu } from "lucide-react";
-
 import { cn } from "@/lib/utils";
-
 import { Accordion } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +20,6 @@ import {
 } from "@/components/ui/sheet";
 import { ModeToggle } from "./ModeToggle";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
 interface MenuItem {
@@ -43,18 +41,8 @@ interface Navbar1Props {
     };
     menu?: MenuItem[];
     auth?: {
-        login: {
-            title: string;
-            url: string;
-        };
-        signup: {
-            title: string;
-            url: string;
-        };
-        dashboard: {
-            title: string;
-            url: string;
-        };
+        login: { title: string; url: string };
+        signup: { title: string; url: string };
     };
 }
 
@@ -67,39 +55,52 @@ const Navbar = ({
     },
     menu = [
         { title: "Home", url: "/" },
-        {
-            title: "Tutors",
-            url: "/tutors",
-        },
-        {
-            title: "About us",
-            url: "/about-us",
-        },
-        {
-            title: "Contact Us",
-            url: "/contact-us",
-        },
+        { title: "Tutors", url: "/tutors" },
+        { title: "About us", url: "/about-us" },
+        { title: "Contact Us", url: "/contact-us" },
     ],
     auth = {
         login: { title: "Login", url: "/login" },
         signup: { title: "Register", url: "/register" },
-        dashboard: { title: "Dashboard", url: "/student-dashboard" },
     },
     className,
 }: Navbar1Props) => {
-    const { data: session, isPending } = authClient.useSession();
+    const { data: session } = authClient.useSession();
+
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const handleLogOut = async () => {
         await authClient.signOut();
     };
 
+    const dashboardUrlSetter = (role?: string) => {
+        switch (role) {
+            case "ADMIN":
+                return "/admin-dashboard";
+            case "TUTOR":
+                return "/tutor-dashboard";
+            case "STUDENT":
+                return "/student-dashboard";
+            default:
+                return "/dashboard"; // Fallback if role is missing
+        }
+    };
+
+    const dashboardLink = dashboardUrlSetter((session?.user as any)?.role);
+    console.log(dashboardLink);
+
     return (
-        <section className={cn("py-4 sticky top-0 z-50 bg-background shadow-sm", className)} suppressHydrationWarning={true}>
+        <section
+            className={cn("py-4 sticky top-0 z-50 bg-background shadow-sm", className)}
+            suppressHydrationWarning={true}>
             <div className="container mx-auto px-4">
                 {/* Desktop Menu */}
                 <nav className="hidden items-center justify-between lg:flex">
                     <div className="flex items-center gap-6">
-                        {/* Logo */}
                         <Link href={logo.url} className="flex items-center gap-2">
                             <img
                                 src={logo.src}
@@ -120,10 +121,12 @@ const Navbar = ({
                     </div>
                     <div className="flex gap-2">
                         <ModeToggle />
-                        {session?.user ? (
+
+                        {/* ✅ Only render auth buttons after component mounts on client */}
+                        {isMounted && session?.user ? (
                             <>
                                 <Button asChild variant="outline" size="sm">
-                                    <Link href={auth.dashboard.url}>Go to Dashboard</Link>
+                                    <Link href={dashboardLink}>Go to Dashboard</Link>
                                 </Button>
                                 <Button asChild variant="outline" size="sm">
                                     <Link href={"/login"} onClick={handleLogOut}>
@@ -132,14 +135,16 @@ const Navbar = ({
                                 </Button>
                             </>
                         ) : (
-                            <>
-                                <Button asChild variant="outline" size="sm">
+                            /* Show Login buttons by default (Server Side Safe) or if no session */
+                            <div className={!isMounted ? "invisible" : ""}>
+                                {/* ^ Prevents layout shift/flash while checking auth */}
+                                <Button asChild variant="outline" size="sm" className="mr-2">
                                     <Link href={auth.login.url}>{auth.login.title}</Link>
                                 </Button>
                                 <Button asChild size="sm">
                                     <Link href={auth.signup.url}>{auth.signup.title}</Link>
                                 </Button>
-                            </>
+                            </div>
                         )}
                     </div>
                 </nav>
@@ -147,7 +152,6 @@ const Navbar = ({
                 {/* Mobile Menu */}
                 <div className="block lg:hidden">
                     <div className="flex items-center justify-between">
-                        {/* Logo */}
                         <Link href={logo.url} className="flex items-center gap-2">
                             <img
                                 src={logo.src}
@@ -184,10 +188,11 @@ const Navbar = ({
                                     </Accordion>
 
                                     <div className="flex flex-col gap-3">
-                                        {session?.user ? (
+                                        {isMounted && session?.user ? (
                                             <>
+                                                {/* ✅ FIX 2: Updated Mobile Link to use Dynamic Variable */}
                                                 <Button asChild variant="outline">
-                                                    <Link href="/dashboard">
+                                                    <Link href={dashboardLink}>
                                                         Go to Dashboard
                                                     </Link>
                                                 </Button>

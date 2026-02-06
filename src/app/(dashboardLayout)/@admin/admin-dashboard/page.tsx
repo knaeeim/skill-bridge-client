@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import React from "react";
 import { adminService } from "@/Services/admin.service";
 import { currentUserService } from "@/Services/curentUser.service";

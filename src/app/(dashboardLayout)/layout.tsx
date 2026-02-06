@@ -11,10 +11,12 @@ export default async function DashboardLayout({
     admin,
     tutor,
     student,
+    children,
 }: {
     admin: ReactNode;
     tutor: ReactNode;
     student: ReactNode;
+    children: ReactNode;
 }) {
     const { data } = await sessionService.getSession();
     const userRole = data?.user.role;
@@ -29,20 +31,23 @@ export default async function DashboardLayout({
                         orientation="vertical"
                         className="mr-2 data-[orientation=vertical]:h-4"
                     />
-                    <Button variant={"outline"}> <ArrowBigLeft/> 
+                    <Button variant={"outline"}>
+                        {" "}
+                        <ArrowBigLeft />
                         <Link href={"/"}>Back to Home Page</Link>
                     </Button>
-                    
+
                     <h1 className="text-xl font-bold text-muted-foreground">
-                        {userRole === "ADMIN" ? "Admin" : userRole === "TUTOR" ? "Tutor" : "Student"} Dashboard
+                        {userRole === "ADMIN"
+                            ? "Admin"
+                            : userRole === "TUTOR"
+                              ? "Tutor"
+                              : "Student"}{" "}
+                        Dashboard
                     </h1>
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4">
-                    {userRole === "ADMIN"
-                        ? admin
-                        : userRole === "TUTOR"
-                          ? tutor
-                          : student}
+                    {userRole === "ADMIN" ? admin : userRole === "TUTOR" ? tutor : student}
                 </div>
             </SidebarInset>
         </SidebarProvider>

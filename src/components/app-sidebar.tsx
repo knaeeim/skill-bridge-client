@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { Route } from "@/types";
-import { Roles } from "@/proxy";
+import { Roles } from "../../proxy";
 import { adminRoutes } from "@/routes/adminRoutes";
 import { tutorRoutes } from "@/routes/tutorRoutes";
 import { studentRoutes } from "@/routes/studentRoutes";

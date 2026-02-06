@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sessionService } from "./Services/session.service";
+import { sessionService } from "./src/Services/session.service";
 
 export const Roles = {
     admin: "ADMIN",
