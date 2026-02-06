@@ -48,7 +48,7 @@ const AllTutors = ({ searchParams }: { searchParams: Promise<{ page: string, lim
             }
         };
         fetchTutors();
-    }, []);
+    }, [page, limit]);
 
     // Loading State (Skeleton)
     if (isLoading) {

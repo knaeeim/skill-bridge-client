@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { createStudentProfileAction } from "@/actions/student.action";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,13 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+    Field,
+    FieldDescription,
+    FieldError,
+    FieldGroup,
+    FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useForm } from "@tanstack/react-form";
 import { GraduationCap, Send } from "lucide-react";
@@ -23,9 +29,9 @@ const StudentRegisterForm = z.object({
     password: z.string().min(8, "Password must be at least 8 characters long"),
     role: z.literal("STUDENT"),
     profile: z.object({
-        bio: z.string().min(10, "Bio must be at least 10 characters long")
+        bio: z.string().min(10, "Bio must be at least 10 characters long"),
     }),
-})
+});
 
 export function StudentSignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     const form = useForm({
@@ -35,29 +41,31 @@ export function StudentSignupForm({ ...props }: React.ComponentProps<typeof Card
             password: "",
             role: "STUDENT",
             profile: {
-                bio: ""
-            }
+                bio: "",
+            },
         },
         validators: {
-            onChange: StudentRegisterForm
+            onChange: StudentRegisterForm,
         },
         onSubmit: async ({ value }) => {
             const toastId = toast.loading("Creating your student account...");
             try {
-                const {data ,error} = await createStudentProfileAction(value)
+                const { data, error } = await createStudentProfileAction(value);
                 console.log(data);
-                if(error){
+                if (error) {
                     return toast.error(`Failed to create account: ${error}`, { id: toastId });
                 }
                 toast.success("Student account created successfully!", { id: toastId });
             } catch (error: unknown) {
                 if (error instanceof Error) {
-                    return toast.error(`Failed to create account: ${error.message}`, { id: toastId });
+                    return toast.error(`Failed to create account: ${error.message}`, {
+                        id: toastId,
+                    });
                 }
                 toast.error("Failed to create account: Unknown error", { id: toastId });
             }
-        }
-    })
+        },
+    });
 
     return (
         <Card className="w-full" {...props}>
@@ -71,49 +79,64 @@ export function StudentSignupForm({ ...props }: React.ComponentProps<typeof Card
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <form onSubmit={(e) => {
-                    e.preventDefault()
-                    form.handleSubmit();
-                }}>
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        form.handleSubmit();
+                    }}>
                     <FieldGroup>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <form.Field
                                 name="name"
                                 children={(field) => {
+                                    const isInvalid =
+                                        field.state.meta.isTouched &&
+                                        !field.state.meta.isValid;
                                     return (
-                                        <Field>
+                                        <Field data-invalid={isInvalid}>
                                             <FieldLabel htmlFor="name">Name</FieldLabel>
                                             <Input
                                                 id="name"
                                                 type="text"
                                                 name={field.name}
                                                 value={field.state.value}
-                                                onChange={(e) => field.handleChange(e.target.value)}
+                                                onChange={(e) =>
+                                                    field.handleChange(e.target.value)
+                                                }
                                                 placeholder="Your full name"
-
                                             />
+                                            {isInvalid && (
+                                                <FieldError errors={field.state.meta.errors} />
+                                            )}
                                         </Field>
-                                    )
+                                    );
                                 }}
                             />
 
                             <form.Field
                                 name="email"
                                 children={(field) => {
+                                    const isInvalid =
+                                        field.state.meta.isTouched &&
+                                        !field.state.meta.isValid;
                                     return (
-                                        <Field>
+                                        <Field data-invalid={isInvalid}>
                                             <FieldLabel htmlFor="email">Email</FieldLabel>
                                             <Input
                                                 id="email"
                                                 type="email"
                                                 name={field.name}
                                                 value={field.state.value}
-                                                onChange={(e) => field.handleChange(e.target.value)}
+                                                onChange={(e) =>
+                                                    field.handleChange(e.target.value)
+                                                }
                                                 placeholder="Your email address"
-
                                             />
+                                            {isInvalid && (
+                                                <FieldError errors={field.state.meta.errors} />
+                                            )}
                                         </Field>
-                                    )
+                                    );
                                 }}
                             />
                         </div>
@@ -122,28 +145,40 @@ export function StudentSignupForm({ ...props }: React.ComponentProps<typeof Card
                             <form.Field
                                 name="password"
                                 children={(field) => {
+                                    const isInvalid =
+                                        field.state.meta.isTouched &&
+                                        !field.state.meta.isValid;
                                     return (
-                                        <Field>
-                                            <FieldLabel htmlFor="password">Password</FieldLabel>
+                                        <Field data-invalid={isInvalid}>
+                                            <FieldLabel htmlFor="password">
+                                                Password
+                                            </FieldLabel>
                                             <Input
                                                 id="password"
                                                 type="password"
                                                 name={field.name}
                                                 value={field.state.value}
-                                                onChange={(e) => field.handleChange(e.target.value)}
+                                                onChange={(e) =>
+                                                    field.handleChange(e.target.value)
+                                                }
                                                 placeholder="Your password"
-
                                             />
+                                            {isInvalid && (
+                                                <FieldError errors={field.state.meta.errors} />
+                                            )}
                                         </Field>
-                                    )
+                                    );
                                 }}
                             />
 
                             <form.Field
                                 name="role"
                                 children={(field) => {
+                                    const isInvalid =
+                                        field.state.meta.isTouched &&
+                                        !field.state.meta.isValid;
                                     return (
-                                        <Field>
+                                        <Field data-invalid={isInvalid}>
                                             <FieldLabel htmlFor="role">Role</FieldLabel>
                                             <Input
                                                 id="role"
@@ -153,29 +188,37 @@ export function StudentSignupForm({ ...props }: React.ComponentProps<typeof Card
                                                 disabled
                                                 className="bg-muted text-muted-foreground font-semibold cursor-not-allowed"
                                             />
+                                            {isInvalid && (
+                                                <FieldError errors={field.state.meta.errors} />
+                                            )}
                                         </Field>
-                                    )
+                                    );
                                 }}
                             />
-
                         </div>
 
                         <form.Field
                             name="profile.bio"
                             children={(field) => {
+                                const isInvalid =
+                                    field.state.meta.isTouched && !field.state.meta.isValid;
                                 return (
-                                    <Field>
+                                    <Field data-invalid={isInvalid}>
                                         <FieldLabel htmlFor="bio">Bio</FieldLabel>
                                         <Input
                                             id="bio"
                                             name={field.name}
                                             value={field.state.value}
-                                            onChange={(e) => field.handleChange(e.target.value)}
+                                            onChange={(e) =>
+                                                field.handleChange(e.target.value)
+                                            }
                                             placeholder="Your Bio Here..."
-
                                         />
+                                        {isInvalid && (
+                                            <FieldError errors={field.state.meta.errors} />
+                                        )}
                                     </Field>
-                                )
+                                );
                             }}
                         />
                         <FieldGroup>
