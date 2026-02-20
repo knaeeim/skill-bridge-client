@@ -915,9 +915,6 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                 <Button type="submit">
                                     <Send /> Create Account
                                 </Button>
-                                <Button variant="outline" type="button">
-                                    Sign up with Google
-                                </Button>
                                 <FieldDescription className="px-6 text-center">
                                     Already have an account? <Link href="/login">Login</Link>
                                 </FieldDescription>
