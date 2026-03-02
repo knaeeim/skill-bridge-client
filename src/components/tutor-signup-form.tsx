@@ -7,7 +7,13 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+    Field,
+    FieldDescription,
+    FieldError,
+    FieldGroup,
+    FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Check, ChevronsUpDown, GraduationCap, Plus, Send, Trash2, X } from "lucide-react";
 import Link from "next/link";
@@ -39,7 +45,7 @@ const TutorRegisterSchema = z.object({
         .string()
         .min(4, "Name must be at least 4 characters long")
         .max(50, "Name must be at most 50 characters long"),
-    email: z.string().email(),
+    email: z.email("Invalid email address"),
     password: z
         .string()
         .min(8, "Password must be at least 8 characters long")
@@ -52,15 +58,17 @@ const TutorRegisterSchema = z.object({
             .max(1000, "Bio must be at most 1000 characters long"),
         experienceYears: z.string().min(1, "Experience years is required"),
         hourlyRate: z.string().min(1, "Hourly rate is required"),
-        subjects: z.array(z.string()),
-        availabilities: z.array(
-            z.object({
-                dayOfWeek: z.array(z.string()).min(1, "At least one day must be selected"),
-                startTime: z.string().min(1, "Start time is required"),
-                endTime: z.string().min(1, "End time is required"),
-            }),
-        ),
-        category: z.array(z.string()),
+        subjects: z.array(z.string()).min(1, "At least one subject must be selected"),
+        availabilities: z
+            .array(
+                z.object({
+                    dayOfWeek: z.array(z.string()).min(1, "At least one day must be selected"),
+                    startTime: z.string().min(1, "Start time is required"),
+                    endTime: z.string().min(1, "End time is required"),
+                }),
+            )
+            .min(1, "At least one availability slot is required"),
+        category: z.array(z.string()).min(1, "At least one category must be selected"),
     }),
 });
 
@@ -99,7 +107,7 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // সরাসরি ফাংশন কল করুন (API URL ফেচ করার দরকার নেই)
+                // direct server action call করা (যা client component থেকে করা যাবে)
                 const data = await getCategories();
                 console.log(data);
                 setCategories(data.data);
@@ -144,16 +152,7 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
             },
         },
         validators: {
-            onChange: ({ value }) => {
-                const result = TutorRegisterSchema.safeParse(value);
-                if (result.success) return undefined;
-                const errors: Record<string, string> = {};
-                result.error.issues.forEach((issue) => {
-                    const path = issue.path.join(".");
-                    errors[path] = issue.message;
-                });
-                return errors;
-            },
+            onChange: TutorRegisterSchema,
         },
         onSubmitInvalid: ({ value, formApi }) => {
             console.log("Validation Failed! Errors:", formApi.state.fieldMeta);
@@ -177,6 +176,13 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                     },
                 };
                 const response = await createTutorProfile(tutorData);
+
+                if (response?.error) {
+                    return toast.error(`Failed to create account: ${response.error}`, {
+                        id: toastId,
+                    });
+                }
+
                 toast.success("Tutor account created successfully!", { id: toastId });
             } catch (error: unknown) {
                 if (error instanceof Error) {
@@ -213,6 +219,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                             <form.Field
                                 name="name"
                                 children={(field) => {
+                                    const isInvalid =
+                                        field.state.meta.isTouched &&
+                                        !field.state.meta.isValid;
                                     return (
                                         <Field>
                                             <FieldLabel htmlFor={field.name}>Name</FieldLabel>
@@ -226,6 +235,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                                 }
                                                 placeholder="Type your name here..."
                                             />
+                                            {isInvalid && (
+                                                <FieldError errors={field.state.meta.errors} />
+                                            )}
                                         </Field>
                                     );
                                 }}
@@ -234,6 +246,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                             <form.Field
                                 name="email"
                                 children={(field) => {
+                                    const isInvalid =
+                                        field.state.meta.isTouched &&
+                                        !field.state.meta.isValid;
                                     return (
                                         <Field>
                                             <FieldLabel htmlFor={field.name}>Email</FieldLabel>
@@ -247,6 +262,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                                 }
                                                 placeholder="Type your email here..."
                                             />
+                                            {isInvalid && (
+                                                <FieldError errors={field.state.meta.errors} />
+                                            )}
                                         </Field>
                                     );
                                 }}
@@ -257,6 +275,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                             <form.Field
                                 name="password"
                                 children={(field) => {
+                                    const isInvalid =
+                                        field.state.meta.isTouched &&
+                                        !field.state.meta.isValid;
                                     return (
                                         <Field>
                                             <FieldLabel htmlFor={field.name}>
@@ -272,6 +293,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                                 }
                                                 placeholder="Type your password here..."
                                             />
+                                            {isInvalid && (
+                                                <FieldError errors={field.state.meta.errors} />
+                                            )}
                                         </Field>
                                     );
                                 }}
@@ -302,6 +326,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                             <form.Field
                                 name="profile.bio"
                                 children={(field) => {
+                                    const isInvalid =
+                                        field.state.meta.isTouched &&
+                                        !field.state.meta.isValid;
                                     return (
                                         <Field>
                                             <FieldLabel htmlFor={field.name}>
@@ -317,6 +344,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                                 }
                                                 placeholder="Type your bio here..."
                                             />
+                                            {isInvalid && (
+                                                <FieldError errors={field.state.meta.errors} />
+                                            )}
                                         </Field>
                                     );
                                 }}
@@ -328,6 +358,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                             <form.Field
                                 name="profile.experienceYears"
                                 children={(field) => {
+                                    const isInvalid =
+                                        field.state.meta.isTouched &&
+                                        !field.state.meta.isValid;
                                     return (
                                         <Field>
                                             <FieldLabel htmlFor={field.name}>
@@ -343,6 +376,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                                 }
                                                 placeholder="Type your experience years here..."
                                             />
+                                            {isInvalid && (
+                                                <FieldError errors={field.state.meta.errors} />
+                                            )}
                                         </Field>
                                     );
                                 }}
@@ -351,6 +387,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                             <form.Field
                                 name="profile.hourlyRate"
                                 children={(field) => {
+                                    const isInvalid =
+                                        field.state.meta.isTouched &&
+                                        !field.state.meta.isValid;
                                     return (
                                         <Field>
                                             <FieldLabel htmlFor={field.name}>
@@ -366,6 +405,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                                 }
                                                 placeholder="Type your hourly rate here..."
                                             />
+                                            {isInvalid && (
+                                                <FieldError errors={field.state.meta.errors} />
+                                            )}
                                         </Field>
                                     );
                                 }}
@@ -380,7 +422,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                     // ১. সেফলি ভ্যালু রিড করা
                                     const selectedValues =
                                         (field.state.value as string[]) || [];
-
+                                    const isInvalid =
+                                        field.state.meta.isTouched &&
+                                        !field.state.meta.isValid;
                                     return (
                                         <Field className="flex flex-col gap-2">
                                             <FieldLabel htmlFor={field.name}>
@@ -515,11 +559,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                             </Popover>
 
                                             {/* এরর মেসেজ */}
-                                            {field.state.meta.errors ? (
-                                                <p className="text-sm text-red-500">
-                                                    {field.state.meta.errors.join(", ")}
-                                                </p>
-                                            ) : null}
+                                            {isInvalid && (
+                                                <FieldError errors={field.state.meta.errors} />
+                                            )}
                                         </Field>
                                     );
                                 }}
@@ -554,6 +596,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                     name="profile.availabilities"
                                     mode="array"
                                     children={(field) => {
+                                        const isInvalid =
+                                            field.state.meta.isTouched &&
+                                            !field.state.meta.isValid;
                                         return (
                                             <div className="space-y-4">
                                                 {field.state.value.map((_, index) => (
@@ -574,49 +619,55 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                                             {/* ১. দিনের সিলেকশন (Day Selector) */}
                                                             <form.Field
                                                                 name={`profile.availabilities[${index}].dayOfWeek`}
-                                                                children={(dayField) => (
-                                                                    <div className="space-y-2">
-                                                                        <Label>
-                                                                            Select Days
-                                                                        </Label>
-                                                                        <div className="flex flex-wrap gap-2">
-                                                                            {DAYS.map(
-                                                                                (day) => {
-                                                                                    const isSelected =
-                                                                                        dayField.state.value.includes(
-                                                                                            day,
-                                                                                        );
-                                                                                    return (
-                                                                                        <div
-                                                                                            key={
-                                                                                                day
-                                                                                            }
-                                                                                            onClick={() => {
-                                                                                                // টগল লজিক
-                                                                                                if (
-                                                                                                    isSelected
-                                                                                                ) {
-                                                                                                    dayField.handleChange(
-                                                                                                        dayField.state.value.filter(
-                                                                                                            (
-                                                                                                                d: string,
-                                                                                                            ) =>
-                                                                                                                d !==
-                                                                                                                day,
-                                                                                                        ),
-                                                                                                    );
-                                                                                                } else {
-                                                                                                    dayField.handleChange(
-                                                                                                        [
-                                                                                                            ...dayField
-                                                                                                                .state
-                                                                                                                .value,
-                                                                                                            day,
-                                                                                                        ],
-                                                                                                    );
+                                                                children={(dayField) => {
+                                                                    const isInvalid =
+                                                                        dayField.state.meta
+                                                                            .isTouched &&
+                                                                        !dayField.state.meta
+                                                                            .isValid;
+                                                                    return (
+                                                                        <div className="space-y-2">
+                                                                            <Label>
+                                                                                Select Days
+                                                                            </Label>
+                                                                            <div className="flex flex-wrap gap-2">
+                                                                                {DAYS.map(
+                                                                                    (day) => {
+                                                                                        const isSelected =
+                                                                                            dayField.state.value.includes(
+                                                                                                day,
+                                                                                            );
+                                                                                        return (
+                                                                                            <div
+                                                                                                key={
+                                                                                                    day
                                                                                                 }
-                                                                                            }}
-                                                                                            className={`
+                                                                                                onClick={() => {
+                                                                                                    // টগল লজিক
+                                                                                                    if (
+                                                                                                        isSelected
+                                                                                                    ) {
+                                                                                                        dayField.handleChange(
+                                                                                                            dayField.state.value.filter(
+                                                                                                                (
+                                                                                                                    d: string,
+                                                                                                                ) =>
+                                                                                                                    d !==
+                                                                                                                    day,
+                                                                                                            ),
+                                                                                                        );
+                                                                                                    } else {
+                                                                                                        dayField.handleChange(
+                                                                                                            [
+                                                                                                                ...dayField
+                                                                                                                    .state
+                                                                                                                    .value,
+                                                                                                                day,
+                                                                                                            ],
+                                                                                                        );
+                                                                                                    }
+                                                                                                }}
+                                                                                                className={`
                                                                 cursor-pointer px-3 py-2 rounded-md text-xs font-semibold border transition-all
                                                                 ${
                                                                     isSelected
@@ -624,106 +675,152 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                                                         : "bg-background hover:bg-muted text-muted-foreground border-input"
                                                                 }
                                                             `}>
-                                                                                            {day.slice(
-                                                                                                0,
-                                                                                                3,
-                                                                                            )}{" "}
-                                                                                            {/* SUN, MON */}
-                                                                                        </div>
-                                                                                    );
-                                                                                },
+                                                                                                {day.slice(
+                                                                                                    0,
+                                                                                                    3,
+                                                                                                )}{" "}
+                                                                                                {/* SUN, MON */}
+                                                                                            </div>
+                                                                                        );
+                                                                                    },
+                                                                                )}
+                                                                            </div>
+                                                                            {isInvalid && (
+                                                                                <FieldError
+                                                                                    errors={
+                                                                                        dayField
+                                                                                            .state
+                                                                                            .meta
+                                                                                            .errors
+                                                                                    }
+                                                                                />
                                                                             )}
                                                                         </div>
-                                                                    </div>
-                                                                )}
+                                                                    );
+                                                                }}
                                                             />
 
                                                             {/* ২. সময় সিলেকশন (Start & End Time) */}
                                                             <div className="grid grid-cols-2 gap-4">
                                                                 <form.Field
                                                                     name={`profile.availabilities[${index}].startTime`}
-                                                                    children={(startField) => (
-                                                                        <div className="space-y-2">
-                                                                            <Label>
-                                                                                Start Time
-                                                                            </Label>
-                                                                            <Select
-                                                                                value={
-                                                                                    startField
-                                                                                        .state
-                                                                                        .value
-                                                                                }
-                                                                                onValueChange={
-                                                                                    startField.handleChange
-                                                                                }>
-                                                                                <SelectTrigger>
-                                                                                    <SelectValue placeholder="Start Time" />
-                                                                                </SelectTrigger>
-                                                                                <SelectContent>
-                                                                                    {TIME_SLOTS.map(
-                                                                                        (
-                                                                                            time,
-                                                                                        ) => (
-                                                                                            <SelectItem
-                                                                                                key={
-                                                                                                    time
-                                                                                                }
-                                                                                                value={
-                                                                                                    time
-                                                                                                }>
-                                                                                                {
-                                                                                                    time
-                                                                                                }
-                                                                                            </SelectItem>
-                                                                                        ),
-                                                                                    )}
-                                                                                </SelectContent>
-                                                                            </Select>
-                                                                        </div>
-                                                                    )}
+                                                                    children={(startField) => {
+                                                                        const isInvalid =
+                                                                            startField.state
+                                                                                .meta
+                                                                                .isTouched &&
+                                                                            !startField.state
+                                                                                .meta.isValid;
+                                                                        return (
+                                                                            <div className="space-y-2">
+                                                                                <Label>
+                                                                                    Start Time
+                                                                                </Label>
+                                                                                <Select
+                                                                                    value={
+                                                                                        startField
+                                                                                            .state
+                                                                                            .value
+                                                                                    }
+                                                                                    onValueChange={
+                                                                                        startField.handleChange
+                                                                                    }>
+                                                                                    <SelectTrigger>
+                                                                                        <SelectValue placeholder="Start Time" />
+                                                                                    </SelectTrigger>
+                                                                                    <SelectContent>
+                                                                                        {TIME_SLOTS.map(
+                                                                                            (
+                                                                                                time,
+                                                                                            ) => (
+                                                                                                <SelectItem
+                                                                                                    key={
+                                                                                                        time
+                                                                                                    }
+                                                                                                    value={
+                                                                                                        time
+                                                                                                    }>
+                                                                                                    {
+                                                                                                        time
+                                                                                                    }
+                                                                                                </SelectItem>
+                                                                                            ),
+                                                                                        )}
+                                                                                    </SelectContent>
+                                                                                </Select>
+                                                                                {isInvalid && (
+                                                                                    <FieldError
+                                                                                        errors={
+                                                                                            startField
+                                                                                                .state
+                                                                                                .meta
+                                                                                                .errors
+                                                                                        }
+                                                                                    />
+                                                                                )}
+                                                                            </div>
+                                                                        );
+                                                                    }}
                                                                 />
 
                                                                 <form.Field
                                                                     name={`profile.availabilities[${index}].endTime`}
-                                                                    children={(endField) => (
-                                                                        <div className="space-y-2">
-                                                                            <Label>
-                                                                                End Time
-                                                                            </Label>
-                                                                            <Select
-                                                                                value={
-                                                                                    endField
-                                                                                        .state
-                                                                                        .value
-                                                                                }
-                                                                                onValueChange={
-                                                                                    endField.handleChange
-                                                                                }>
-                                                                                <SelectTrigger>
-                                                                                    <SelectValue placeholder="End Time" />
-                                                                                </SelectTrigger>
-                                                                                <SelectContent>
-                                                                                    {TIME_SLOTS.map(
-                                                                                        (
-                                                                                            time,
-                                                                                        ) => (
-                                                                                            <SelectItem
-                                                                                                key={
-                                                                                                    time
-                                                                                                }
-                                                                                                value={
-                                                                                                    time
-                                                                                                }>
-                                                                                                {
-                                                                                                    time
-                                                                                                }
-                                                                                            </SelectItem>
-                                                                                        ),
-                                                                                    )}
-                                                                                </SelectContent>
-                                                                            </Select>
-                                                                        </div>
-                                                                    )}
+                                                                    children={(endField) => {
+                                                                        const isInvalid =
+                                                                            endField.state.meta
+                                                                                .isTouched &&
+                                                                            !endField.state
+                                                                                .meta.isValid;
+                                                                        return (
+                                                                            <div className="space-y-2">
+                                                                                <Label>
+                                                                                    End Time
+                                                                                </Label>
+                                                                                <Select
+                                                                                    value={
+                                                                                        endField
+                                                                                            .state
+                                                                                            .value
+                                                                                    }
+                                                                                    onValueChange={
+                                                                                        endField.handleChange
+                                                                                    }>
+                                                                                    <SelectTrigger>
+                                                                                        <SelectValue placeholder="End Time" />
+                                                                                    </SelectTrigger>
+                                                                                    <SelectContent>
+                                                                                        {TIME_SLOTS.map(
+                                                                                            (
+                                                                                                time,
+                                                                                            ) => (
+                                                                                                <SelectItem
+                                                                                                    key={
+                                                                                                        time
+                                                                                                    }
+                                                                                                    value={
+                                                                                                        time
+                                                                                                    }>
+                                                                                                    {
+                                                                                                        time
+                                                                                                    }
+                                                                                                </SelectItem>
+                                                                                            ),
+                                                                                        )}
+                                                                                    </SelectContent>
+                                                                                </Select>
+                                                                                {isInvalid && (
+                                                                                    <FieldError
+                                                                                        errors={
+                                                                                            endField
+                                                                                                .state
+                                                                                                .meta
+                                                                                                .errors
+                                                                                        }
+                                                                                    />
+                                                                                )}
+                                                                            </div>
+                                                                        );
+                                                                    }}
                                                                 />
                                                             </div>
                                                         </CardContent>
@@ -731,10 +828,10 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                                 ))}
 
                                                 {/* যদি কোনো স্লট না থাকে */}
-                                                {field.state.value.length === 0 && (
-                                                    <div className="text-center p-8 border-2 border-dashed rounded-lg text-muted-foreground">
-                                                        No availability slots added yet.
-                                                    </div>
+                                                {isInvalid && (
+                                                    <FieldError
+                                                        errors={field.state.meta.errors}
+                                                    />
                                                 )}
                                             </div>
                                         );
@@ -750,7 +847,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                     // ১. ফর্মে আমরা ID গুলো সেভ রাখছি (যেমন: ["uuid-1", "uuid-2"])
                                     const selectedCategoryIds =
                                         (field.state.value as string[]) || [];
-
+                                    const isInvalid =
+                                        field.state.meta.isTouched &&
+                                        !field.state.meta.isValid;
                                     return (
                                         <Field className="flex flex-col gap-2">
                                             <FieldLabel htmlFor="category-field">
@@ -900,11 +999,9 @@ export function TutorSignupForm({ ...props }: React.ComponentProps<typeof Card>)
                                             </Popover>
 
                                             {/* Error Message */}
-                                            {field.state.meta.errors ? (
-                                                <p className="text-sm text-red-500">
-                                                    {field.state.meta.errors.join(", ")}
-                                                </p>
-                                            ) : null}
+                                            {isInvalid && (
+                                                <FieldError errors={field.state.meta.errors} />
+                                            )}
                                         </Field>
                                     );
                                 }}

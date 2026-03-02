@@ -93,7 +93,15 @@ export const tutorServices = {
                 body: JSON.stringify(tutorData)
             })
             const data = await response.json();
-            console.log(data);
+
+            if (!response.ok) {
+                const errorMessage =
+                    data?.message ||
+                    data?.error ||
+                    `Request failed with status ${response.status}`;
+                return { data: null, error: errorMessage };
+            }
+
             return { data: data, error: null }
         } catch (error: unknown) {
             if (error instanceof Error) {

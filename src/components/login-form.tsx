@@ -8,7 +8,13 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+    Field,
+    FieldDescription,
+    FieldError,
+    FieldGroup,
+    FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import * as z from "zod";
 import { useForm } from "@tanstack/react-form";
@@ -69,6 +75,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                             <form.Field
                                 name="email"
                                 children={(field) => {
+                                    const isInvalid =
+                                        field.state.meta.isTouched &&
+                                        !field.state.meta.isValid;
                                     return (
                                         <Field>
                                             <FieldLabel>Email</FieldLabel>
@@ -81,6 +90,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                                                 }
                                                 placeholder="Type your email here..."
                                             />
+                                            {isInvalid && (
+                                                <FieldError errors={field.state.meta.errors} />
+                                            )}
                                         </Field>
                                     );
                                 }}
@@ -88,6 +100,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                             <form.Field
                                 name="password"
                                 children={(field) => {
+                                    const isInvalid =
+                                        field.state.meta.isTouched &&
+                                        !field.state.meta.isValid;
                                     return (
                                         <Field>
                                             <FieldLabel>Password</FieldLabel>
@@ -100,6 +115,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
                                                 }
                                                 placeholder="Type your password here..."
                                             />
+                                            {isInvalid && (
+                                                <FieldError errors={field.state.meta.errors} />
+                                            )}
                                         </Field>
                                     );
                                 }}
